@@ -110,9 +110,22 @@ public class CurveMaker : EditorWindow
 		}
 	}
 	
+	// create a new nodes object, populate it with numNodes children, and put it in nodeParent
+	private void CreateNodes() {
+		nodeParent = new GameObject("Nodes");
+		nodeParent.AddComponent(typeof(NodeInfo));
+		Vector3 cameraPosition = UnityEditor.SceneView.lastActiveSceneView.camera.transform.position + 
+			                     UnityEditor.SceneView.lastActiveSceneView.camera.transform.forward*50;
+		nodeParent.transform.position = new Vector3((int) cameraPosition.x, (int) cameraPosition.y, (int) cameraPosition.z);
+		nodes = new List<GameObject>(); 
+		for (int i = 0; i < numNodes; i++) {
+			AddNode();
+		}
+	}
+	
 	// load the currently selected game object into nodeParent and its children into the nodes list
-	private void LoadNodes() {
-		nodeParent = Selection.activeGameObject;
+	private void LoadNodes(GameObject np) {
+		nodeParent = np;
 		if (nodeParent == null) return;
 		
 		if (nodeParent.GetComponent<NodeInfo>() == null) {
@@ -183,19 +196,111 @@ public class CurveMaker : EditorWindow
 			nodes[position].transform.rotation = nodes[position-1].transform.rotation;
 			return;
 		}
-		float nodeSmoothness = nodeParent.GetComponent<NodeInfo>().nodeSmoothness;
+		float nodeSmoothnessFirst = nodes[position-1].GetComponent<NodeSmoothness>().smoothness;
+		float nodeSmoothnessSecond = nodes[position+1].GetComponent<NodeSmoothness>().smoothness;
 		(Func<float, float>, Func<float, float>) xs = Bezier.LambdasFromNodes(
 				new float[] {nodes[position-1].transform.position.x, nodes[position+1].transform.position.x}, 
-				new float[] {nodes[position-1].transform.right.x*nodeSmoothness, nodes[position+1].transform.right.x*nodeSmoothness});
+				new float[] {nodes[position-1].transform.right.x*nodeSmoothnessFirst, nodes[position+1].transform.right.x*nodeSmoothnessSecond});
 		(Func<float, float>, Func<float, float>) ys = Bezier.LambdasFromNodes(
 				new float[] {nodes[position-1].transform.position.y, nodes[position+1].transform.position.y}, 
-				new float[] {nodes[position-1].transform.right.y*nodeSmoothness, nodes[position+1].transform.right.y*nodeSmoothness});
+				new float[] {nodes[position-1].transform.right.y*nodeSmoothnessFirst, nodes[position+1].transform.right.y*nodeSmoothnessSecond});
 		(Func<float, float>, Func<float, float>) zs = Bezier.LambdasFromNodes(
 				new float[] {nodes[position-1].transform.position.z, nodes[position+1].transform.position.z}, 
-				new float[] {nodes[position-1].transform.right.z*nodeSmoothness, nodes[position+1].transform.right.z*nodeSmoothness});
+				new float[] {nodes[position-1].transform.right.z*nodeSmoothnessFirst, nodes[position+1].transform.right.z*nodeSmoothnessSecond});
 				
 		nodes[position].transform.position = new Vector3(xs.Item1(0.5f), ys.Item1(0.5f), zs.Item1(0.5f));
-		nodes[position].transform.right = (new Vector3(xs.Item2(0.5f), ys.Item2(0.5f), zs.Item2(0.5f))).normalized;
+		Vector3 direction = new Vector3(xs.Item2(0.5f), ys.Item2(0.5f), zs.Item2(0.5f));
+		nodes[position].transform.right = direction.normalized;
+		ns.SetSmoothness(direction.magnitude);
+	}
+	
+	private void MakeCurve() {
+		if (nodeParent == null) {
+			message = "No nodes selected";
+			return;
+		}	
+		LoadNodes(nodeParent);
+		RenameNodes(0);
+		NodeInfo ni = nodeParent.GetComponent<NodeInfo>();
+		if (ni == null) {
+			message = "No nodes selected";
+			return;
+		}
+		
+		(Func<float, float>, Func<float, float>) xs = Bezier.LambdasFromNodes(NodePositionsDimension(0), NodeDirectionsDimension(0, NodeSmoothValues()));
+		(Func<float, float>, Func<float, float>) ys = Bezier.LambdasFromNodes(NodePositionsDimension(1), NodeDirectionsDimension(1, NodeSmoothValues()));
+		(Func<float, float>, Func<float, float>) zs = Bezier.LambdasFromNodes(NodePositionsDimension(2), NodeDirectionsDimension(2, NodeSmoothValues()));
+
+		ParametricCurve curve = new ParametricCurve(xs.Item1, xs.Item2, ys.Item1, ys.Item2, zs.Item1, zs.Item2, t => 0);
+
+		curve.SetShape(ni.shapeMode);
+		curve.SetTRange(0, nodes.Count - 1);
+		curve.SetStepLength(ni.lengthStepSize);
+		curve.SetBoxSize(ni.width, ni.widthStepSize, ni.height);
+		curve.SetRadius(ni.innerRadius, ni.outerRadius);
+		curve.SetDivisions(ni.divisions);
+		curve.SetOffset(ni.widthOffset, ni.heightOffset);
+		curve.SetFaces(ni.topFace, ni.bottomFace, ni.leftFace, ni.rightFace, ni.startFace, ni.endFace);
+		curve.SetRound(ni.roundLength);
+		curve.SetUVScale(ni.uvScale);
+		curve.SetUVOffset(ni.uvOffset);
+		curve.SetNormals(NodeNormals());
+		curve.SetAngleInterpolationMode(ni.angleInterpolationMode);
+				
+		float[] angles = new float[nodes.Count];
+		float[] angleChanges = new float[nodes.Count];
+		for (int i = 0; i < nodes.Count; i++) {
+			angles[i] = curve.AngleFromVector(nodes[i].transform.up, i);
+			angleChanges[i] = 0;
+		}
+		(Func<float, float>, Func<float, float>) thetas = Bezier.LambdasFromNodes(angles, angleChanges);
+		curve.SetTheta(thetas.Item1);
+			
+		curve.makeVertsAndFaces();
+			
+		GameObject EmptyObj = new GameObject("Curve");
+			
+		Mesh mesh = new Mesh();
+		MeshFilter mf = EmptyObj.AddComponent(typeof(MeshFilter)) as MeshFilter;
+		MeshCollider mc = EmptyObj.AddComponent<MeshCollider>();
+		mesh.vertices = curve.vertices;
+		mesh.uv = curve.uvs;
+		mesh.triangles = curve.triangles;
+		mesh.name = "curveMesh";
+		mf.sharedMesh = mesh;
+		mc.sharedMesh = mesh;
+				
+		MeshRenderer mr = EmptyObj.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
+		mr.sharedMaterial = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Material.mat");
+			
+		message = "Curve Created Successfully";
+	}
+	
+	private void AutoPosition() {
+		if (nodeParent == null) {
+			message = "No nodes selected";
+			return;
+		}
+		LoadNodes(nodeParent);
+		float smoothStart = nodes[0].GetComponent<NodeSmoothness>().GetSmoothness();
+		float smoothEnd = nodes[nodes.Count-1].GetComponent<NodeSmoothness>().GetSmoothness();
+		float[] dxs = Bezier.Spline(NodePositionsDimension(0), 
+									NodeDirection(0).x*smoothStart, 
+									NodeDirection(nodes.Count-1).x*smoothEnd);
+		float[] dys = Bezier.Spline(NodePositionsDimension(1), 
+									NodeDirection(0).y*smoothStart, 
+									NodeDirection(nodes.Count-1).y*smoothEnd);
+		float[] dzs = Bezier.Spline(NodePositionsDimension(2), 
+									NodeDirection(0).z*smoothStart, 
+									NodeDirection(nodes.Count-1).z*smoothEnd);
+										
+		for (int i = 0; i < nodes.Count; i++) {
+			Vector3 d = new Vector3(dxs[i], dys[i], dzs[i]);
+			nodes[i].transform.right = d.normalized;
+			nodes[i].GetComponent<NodeSmoothness>().SetSmoothness(d.magnitude);
+		}
+		
+		message = "Internal Nodes Positioned Successfully";
 	}
 
 	// draw the GUI elements
@@ -208,18 +313,10 @@ public class CurveMaker : EditorWindow
 		numNodes = EditorGUILayout.IntField("Number of Nodes:", numNodes);
 		
 		if (GUILayout.Button("Create New Nodes")) {
-			nodeParent = new GameObject("Nodes");
-			nodeParent.AddComponent(typeof(NodeInfo));
-			Vector3 cameraPosition = UnityEditor.SceneView.lastActiveSceneView.camera.transform.position + 
-			                         UnityEditor.SceneView.lastActiveSceneView.camera.transform.forward*50;
-			nodeParent.transform.position = new Vector3((int) cameraPosition.x, (int) cameraPosition.y, (int) cameraPosition.z);
-			nodes = new List<GameObject>(); 
-			for (int i = 0; i < numNodes; i++) {
-				AddNode();
-			}
+			CreateNodes();
 		}
 		if (GUILayout.Button("Load Selected Nodes")) {
-			LoadNodes();
+			LoadNodes(Selection.activeGameObject);
 		}
 		
 		nodePosition = EditorGUILayout.IntField("Position:", nodePosition);
@@ -314,34 +411,20 @@ public class CurveMaker : EditorWindow
 		innerScrollPosition = EditorGUILayout.BeginScrollView(innerScrollPosition, GUILayout.Height(65));
 		EditorGUILayout.BeginHorizontal();
 		for (int i = 0; i < nodes.Count; i++) {
-			NodeSmoothness ns = nodes[i].GetComponent<NodeSmoothness>();
-			ns.SetSmoothness(EditorGUILayout.FloatField((i+1).ToString() + ":", ns.GetSmoothness()));
-			if ((i+1) % 3 == 0) {
-				EditorGUILayout.EndHorizontal();
-				EditorGUILayout.BeginHorizontal();
+			if (nodes[i] != null) {
+				NodeSmoothness ns = nodes[i].GetComponent<NodeSmoothness>();
+				ns.SetSmoothness(EditorGUILayout.FloatField((i+1).ToString() + ":", ns.GetSmoothness()));
+				if ((i+1) % 3 == 0) {
+					EditorGUILayout.EndHorizontal();
+					EditorGUILayout.BeginHorizontal();
+				}
 			}
 		}
 		EditorGUILayout.EndHorizontal();
 		EditorGUILayout.EndScrollView();
 		
 		if (GUILayout.Button("Auto-Position Internal Nodes")) {
-			float smoothStart = nodes[0].GetComponent<NodeSmoothness>().GetSmoothness();
-			float smoothEnd = nodes[nodes.Count-1].GetComponent<NodeSmoothness>().GetSmoothness();
-			float[] dxs = Bezier.Spline(NodePositionsDimension(0), 
-										NodeDirection(0).x*smoothStart, 
-										NodeDirection(nodes.Count-1).x*smoothEnd);
-			float[] dys = Bezier.Spline(NodePositionsDimension(1), 
-										NodeDirection(0).y*smoothStart, 
-										NodeDirection(nodes.Count-1).y*smoothEnd);
-			float[] dzs = Bezier.Spline(NodePositionsDimension(2), 
-										NodeDirection(0).z*smoothStart, 
-										NodeDirection(nodes.Count-1).z*smoothEnd);
-										
-			for (int i = 0; i < nodes.Count; i++) {
-				Vector3 d = new Vector3(dxs[i], dys[i], dzs[i]);
-				nodes[i].transform.right = d.normalized;
-				nodes[i].GetComponent<NodeSmoothness>().SetSmoothness(d.magnitude);
-			}
+			AutoPosition();
 		}
 		
 		EditorGUILayout.BeginHorizontal();
@@ -364,58 +447,7 @@ public class CurveMaker : EditorWindow
 		EditorGUILayout.EndHorizontal();
 		
 		if (GUILayout.Button("Make Curve")) {
-			
-			if (nodeParent == null) {
-				message = "Selected nodes have been deleted";
-			} else {			
-				(Func<float, float>, Func<float, float>) xs = Bezier.LambdasFromNodes(NodePositionsDimension(0), NodeDirectionsDimension(0, NodeSmoothValues()));
-				(Func<float, float>, Func<float, float>) ys = Bezier.LambdasFromNodes(NodePositionsDimension(1), NodeDirectionsDimension(1, NodeSmoothValues()));
-				(Func<float, float>, Func<float, float>) zs = Bezier.LambdasFromNodes(NodePositionsDimension(2), NodeDirectionsDimension(2, NodeSmoothValues()));
-
-				ParametricCurve curve = new ParametricCurve(xs.Item1, xs.Item2, ys.Item1, ys.Item2, zs.Item1, zs.Item2, t => 0);
-
-				curve.SetShape(ni.shapeMode);
-				curve.SetTRange(0, nodes.Count - 1);
-				curve.SetStepLength(ni.lengthStepSize);
-				curve.SetBoxSize(ni.width, ni.widthStepSize, ni.height);
-				curve.SetRadius(ni.innerRadius, ni.outerRadius);
-				curve.SetDivisions(ni.divisions);
-				curve.SetOffset(ni.widthOffset, ni.heightOffset);
-				curve.SetFaces(ni.topFace, ni.bottomFace, ni.leftFace, ni.rightFace, ni.startFace, ni.endFace);
-				curve.SetRound(ni.roundLength);
-				curve.SetUVScale(ni.uvScale);
-				curve.SetUVOffset(ni.uvOffset);
-				curve.SetNormals(NodeNormals());
-				curve.SetAngleInterpolationMode(ni.angleInterpolationMode);
-				
-				float[] angles = new float[nodes.Count];
-				float[] angleChanges = new float[nodes.Count];
-				for (int i = 0; i < nodes.Count; i++) {
-					angles[i] = curve.AngleFromVector(nodes[i].transform.up, i);
-					angleChanges[i] = 0;
-				}
-				(Func<float, float>, Func<float, float>) thetas = Bezier.LambdasFromNodes(angles, angleChanges);
-				curve.SetTheta(thetas.Item1);
-			
-				curve.makeVertsAndFaces();
-			
-				GameObject EmptyObj = new GameObject("Curve");
-			
-				Mesh mesh = new Mesh();
-				MeshFilter mf = EmptyObj.AddComponent(typeof(MeshFilter)) as MeshFilter;
-				MeshCollider mc = EmptyObj.AddComponent<MeshCollider>();
-				mesh.vertices = curve.vertices;
-				mesh.uv = curve.uvs;
-				mesh.triangles = curve.triangles;
-				mesh.name = "curveMesh";
-				mf.sharedMesh = mesh;
-				mc.sharedMesh = mesh;
-				
-				MeshRenderer mr = EmptyObj.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
-				mr.sharedMaterial = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Material.mat");
-			
-				message = "Curve Created Successfully";
-			}
+			MakeCurve();
 		}
 		
 		EditorGUILayout.LabelField(message);

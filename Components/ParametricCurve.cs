@@ -303,7 +303,6 @@ public class ParametricCurve {
 				
 				int k = divisionIndices[i+1] - (j - divisionIndices[i]) - 1;
 				prevNormal = (j == divisionIndices[i]) ? nodeNormals[i+1] : unmergedNormals[k+1,1];
-				//Debug.Log("unmerged normal: " + PlaneProject(prevNormal, direction(tSteps[k])).ToString());
 				unmergedNormals[k,1] = PlaneProject(prevNormal, direction(tSteps[k]));
 			}
 			
@@ -345,8 +344,8 @@ public class ParametricCurve {
 		List<float> widthStepList = GetWidthSteps();
 		int numWidthSteps = widthStepList.Count;
 	
-		vertices = new Vector3[numTSteps*numWidthSteps*4];
-		uvs = new Vector2[numTSteps*numWidthSteps*4];
+		vertices = new Vector3[numTSteps*numWidthSteps*2 + numTSteps*2 + numWidthSteps*2];
+		uvs = new Vector2[vertices.Length];
 		int[,,] points = new int[numTSteps, numWidthSteps, 4];
 		
 		float totalArcLength = 0;
@@ -385,6 +384,7 @@ public class ParametricCurve {
 				
 				Vector3 finalOffset = offset * (widthPosition - (width/ 2)) + offset*masterWidthOffset + offsetHeight*masterHeightOffset;
 				Vector3 finalPosition = currPosition + finalOffset;
+				int firstK = k;
 				points[i,j,0] = k;
 				if (evenStepLength) {
 					float uvAdjustment = 1;
@@ -401,21 +401,22 @@ public class ParametricCurve {
 				uvs[k] = uvs[k-1];
 				vertices[k++] = finalPosition - offsetHeight*height;
 				
-				points[i,j,2] = k;
-				uvs[k] = uvs[k-2] + new Vector2(0, height*uvScale[2]);
-				vertices[k++] = finalPosition - offsetHeight*height;
+				if (j == 0 || j == numWidthSteps-1) {
+					points[i,j,2] = k;
+					uvs[k] = uvs[firstK] + new Vector2(0, height*uvScale[2]);
+					vertices[k++] = finalPosition - offsetHeight*height;
+				}
 				
-				points[i,j,3] = k;
-				uvs[k] = uvs[k-3] + new Vector2(height*uvScale[2], 0);
-				vertices[k++] = finalPosition - offsetHeight*height;
+				if (i == 0 || i == numTSteps-1) {
+					points[i,j,3] = k;
+					uvs[k] = uvs[firstK] + new Vector2(height*uvScale[2], 0);
+					vertices[k++] = finalPosition - offsetHeight*height;
+				}
 				
 			}
 		}
 
-		triangles = new int[numTSteps*numWidthSteps*4*3];
-		for (int i = 0; i < numTSteps*numWidthSteps*4*3; i++) {
-			triangles[i] = 0;
-		}
+		triangles = new int[(numTSteps*numWidthSteps*4-4)*3];
 		
 		// faces
 		k = 0;
@@ -423,13 +424,11 @@ public class ParametricCurve {
 			for (int j = 0; j < numWidthSteps; j++) {
 				if (i == 0 && startFace) {
 					if (j > 0) {
-						//file_content += face(points[i][j][3], points[i][j][5], points[i][j][4], points[i][j][7], points[i][j-1][3], points[i][j-1][5])
 						triangles[k++] = points[i,j,0];
 						triangles[k++] = points[i,j-1,0];
 						triangles[k++] = points[i,j,3];
 					}
 					if (j < numWidthSteps-1) {
-						//file_content += face(points[i][j][3], points[i][j][5], points[i][j+1][4], points[i][j+1][7], points[i][j][4], points[i][j][7])
 						triangles[k++] = points[i,j,0];
 						triangles[k++] = points[i,j,3];
 						triangles[k++] = points[i,j+1,3];
@@ -437,13 +436,11 @@ public class ParametricCurve {
 				}
 				if (i == numTSteps-1 && endFace) {
 					if (j > 0) {
-						//file_content += face(points[i][j][3], points[i][j][5], points[i][j-1][3], points[i][j-1][5], points[i][j][4], points[i][j][7])
 						triangles[k++] = points[i,j,0];
 						triangles[k++] = points[i,j,3];
 						triangles[k++] = points[i,j-1,0];
 					}
 					if (j < numWidthSteps-1) {
-						//file_content += face(points[i][j][3], points[i][j][5], points[i][j][4], points[i][j][7], points[i][j+1][4], points[i][j+1][7])
 						triangles[k++] = points[i,j,0];
 						triangles[k++] = points[i,j+1,3];
 						triangles[k++] = points[i,j,3];
@@ -463,13 +460,11 @@ public class ParametricCurve {
 				}
 				if (j == numWidthSteps-1 && leftFace) {
 					if (i > 0) {
-						//file_content += face(points[i][j][3], points[i][j][5], points[i][j][4], points[i][j][6], points[i-1][j][3], points[i-1][j][5])
 						triangles[k++] = points[i,j,0];
 						triangles[k++] = points[i-1,j,0];
 						triangles[k++] = points[i,j,2];
 					}
 					if (i < numTSteps-1) {
-						//file_content += face(points[i][j][3], points[i][j][5], points[i+1][j][4], points[i+1][j][6], points[i][j][4], points[i][j][6])
 						triangles[k++] = points[i,j,0];
 						triangles[k++] = points[i,j,2];
 						triangles[k++] = points[i+1,j,2];
@@ -520,9 +515,9 @@ public class ParametricCurve {
 		//List<float> widthStepList = GetWidthSteps();
 		int numWidthSteps = divisions;
 	
-		vertices = new Vector3[numTSteps*(numWidthSteps+1)*4];
-		uvs = new Vector2[numTSteps*(numWidthSteps+1)*4];
-		int[,,] points = new int[numTSteps, numWidthSteps+1, 4];
+		vertices = new Vector3[numTSteps*(numWidthSteps+1)*2 + (numWidthSteps+1)*2];
+		uvs = new Vector2[vertices.Length];
+		int[,,] points = new int[numTSteps, numWidthSteps+1, 3];
 		
 		float totalArcLength = 0;
 		float lengthAdjustment = 1;
@@ -567,6 +562,8 @@ public class ParametricCurve {
 				Vector3 offset = offsetX * (float) Math.Cos(widthPosition*2*Math.PI) + offsetY * (float) Math.Sin(widthPosition*2*Math.PI);				  
 				Vector3 masterOffset = offsetX * masterWidthOffset  + offsetY * masterHeightOffset;
 				Vector3 finalPosition = currPosition + innerRadius*offset + masterOffset;
+				
+				int firstK = k;
 				points[i,j,0] = k;
 				if (evenStepLength) {
 					float uvAdjustment = 1;
@@ -578,19 +575,16 @@ public class ParametricCurve {
 					uvs[k] = new Vector2(arcLengthSum*lengthAdjustment*uvScale[0] + uvOffset[0], widthPosition*circumference*uvScale[1] + uvOffset[1]);
 				}
 				vertices[k++] = finalPosition;
-				Debug.Log(finalPosition);
 				
 				points[i,j,1] = k;
-				uvs[k] = uvs[k-1];
+				uvs[k] = uvs[firstK];
 				vertices[k++] = finalPosition + offset*(outerRadius - innerRadius);
 				
-				points[i,j,2] = k;
-				uvs[k] = uvs[k-2] + new Vector2(0, (outerRadius - innerRadius)*uvScale[2]);
-				vertices[k++] = finalPosition + offset*(outerRadius - innerRadius);
-				
-				points[i,j,3] = k;
-				uvs[k] = uvs[k-3] + new Vector2((outerRadius - innerRadius)*uvScale[2], 0);
-				vertices[k++] = finalPosition + offset*(outerRadius - innerRadius);
+				if (i == 0 || i == numTSteps-1) {
+					points[i,j,2] = k;
+					uvs[k] = uvs[firstK] + new Vector2((outerRadius - innerRadius)*uvScale[2], 0);
+					vertices[k++] = finalPosition + offset*(outerRadius - innerRadius);
+				}
 			}
 		}
 		
@@ -607,29 +601,29 @@ public class ParametricCurve {
 					if (j > 0) {
 						triangles[k++] = points[i,j,0];
 						triangles[k++] = points[i,j-1,0];
-						triangles[k++] = points[i,j,3];
+						triangles[k++] = points[i,j,2];
 					}
 					triangles[k++] = points[i,j,0];
-					triangles[k++] = points[i,j,3];
-					triangles[k++] = points[i,j+1,3];
+					triangles[k++] = points[i,j,2];
+					triangles[k++] = points[i,j+1,2];
 					if (j == numWidthSteps-1) {
 						triangles[k++] = points[i,j+1,0];
 						triangles[k++] = points[i,j,0];
-						triangles[k++] = points[i,j+1,3];
+						triangles[k++] = points[i,j+1,2];
 					}
 				}
 				if (i == numTSteps-1) {
 					if (j > 0) {
 						triangles[k++] = points[i,j,0];
-						triangles[k++] = points[i,j,3];
+						triangles[k++] = points[i,j,2];
 						triangles[k++] = points[i,j-1,0];
 					}
 					triangles[k++] = points[i,j,0];
-					triangles[k++] = points[i,j+1,3];
-					triangles[k++] = points[i,j,3];
+					triangles[k++] = points[i,j+1,2];
+					triangles[k++] = points[i,j,2];
 					if (j == numWidthSteps-1) {
 						triangles[k++] = points[i,j+1,0];
-						triangles[k++] = points[i,j+1,3];
+						triangles[k++] = points[i,j+1,2];
 						triangles[k++] = points[i,j,0];
 					}
 				}

@@ -9,7 +9,7 @@ public class NodeInfo : MonoBehaviour
 	public float height = 1;
 	public float innerRadius = 4;
 	public float outerRadius = 5;
-	public int divisions = 32;
+	public int divisions = 16;
 	public float widthOffset = 0;
 	public float heightOffset = 0;
     public float lengthStepSize = 1;
