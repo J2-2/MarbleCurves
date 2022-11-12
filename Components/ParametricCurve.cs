@@ -23,6 +23,15 @@ public class ParametricCurve {
 	
 	private float innerRadius, outerRadius;
 	
+	private Vector2[] customPoints;
+	private List<(float, float)> customUVs;
+	private List<(Vector2, Vector2)> customNormals;
+	private (Vector3[], Vector2[], int[]) customCap;
+	
+	private GameObject fitObject;
+	private float fitOffset;
+	private bool fitStretch;
+	
 	private int divisions;
 	
 	private float masterWidthOffset, masterHeightOffset;
@@ -32,7 +41,7 @@ public class ParametricCurve {
 	private int roundLength;
 	
 	private Vector3 uvScale;
-	private Vector2 uvOffset;
+	private Vector3 uvOffset;
 	
 	private int shapeMode;
 	
@@ -45,6 +54,7 @@ public class ParametricCurve {
 	public Vector3[] vertices;
 	public Vector2[] uvs;
 	public int[] triangles;
+	public Vector3[] meshNormals;
 
 	// constructor 
     public ParametricCurve(Func<float, float> x, Func<float, float> dx, 
@@ -129,6 +139,20 @@ public class ParametricCurve {
 		this.outerRadius = outerRadius;
 	}
 	
+	public void SetCustom(Vector2[] customPoints, List<(float, float)> customUVs, List<(Vector2, Vector2)> customNormals, (Vector3[], Vector2[], int[]) customCap) {
+		this.customPoints = customPoints;
+		this.customUVs = customUVs;
+		this.customNormals = customNormals;
+		this.customCap = customCap;
+	}
+	
+	public void SetFitObject(GameObject fitObject, float fitOffset, bool fitStretch) {
+		this.fitObject = fitObject;
+		this.fitOffset = fitOffset;
+		this.fitStretch = fitStretch;
+	}
+	
+	
 	public void SetDivisions(int divisions) {
 		this.divisions = divisions;
 	}
@@ -146,7 +170,7 @@ public class ParametricCurve {
 		this.uvScale = uvScale; 
 	}
 	
-	public void SetUVOffset(Vector2 uvOffset) {
+	public void SetUVOffset(Vector3 uvOffset) {
 		this.uvOffset = uvOffset; 
 	}
 	
@@ -319,14 +343,258 @@ public class ParametricCurve {
 	}
 	
 	public void makeVertsAndFaces() {
+		
 		if (shapeMode == 0) {
 			makeVertsAndFacesBox();
-		} else {
+		} else if (shapeMode == 1) {
 			makeVertsAndFacesTube();
+		} else {
+			makeVertsAndFacesCustom();
 		}
 	}
 	
-	// 
+	public Mesh FitToCurve() {
+		Mesh mesh = fitObject.GetComponent<MeshFilter>().sharedMesh;
+		Mesh newMesh = new Mesh();
+		
+		Dictionary<float, float> XToTMap = new Dictionary<float, float>();
+		for (int i = 0; i < mesh.vertices.Length; i++) {
+			if (!XToTMap.ContainsKey(mesh.vertices[i].x + fitOffset)) {
+				XToTMap[mesh.vertices[i].x + fitOffset] = -1;
+			}
+		}
+		
+		List<float> xValues = new List<float>(XToTMap.Keys);
+		xValues.Sort();
+		
+		float scale = 1;
+		
+		
+		if (fitStretch) {
+			scale = (ArcLength(lower, upper, NUM_INTERVALS) - fitOffset) / (xValues[xValues.Count-1] - fitOffset);
+			
+		}
+		
+		float stepSize = (upper - lower)/(NUM_INTERVALS);
+		float prev = (float) (Math.Sqrt(Math.Pow(dx(0), 2) + Math.Pow(dy(0), 2) + Math.Pow(dz(0), 2)));
+		float curr;
+		int target = 0;
+		float sum = 0;
+		float t = stepSize;
+		while (target < xValues.Count) {
+			curr = (float) (Math.Sqrt(Math.Pow(dx(t), 2) + Math.Pow(dy(t), 2) + Math.Pow(dz(t), 2)));
+			float midValue = (t + (t - stepSize)) / 2;
+			float newSum = sum + (float) ((prev + 4*Math.Sqrt(Math.Pow(dx(midValue), 2) + Math.Pow(dy(midValue), 2) + Math.Pow(dz(midValue), 2)) + curr) * (stepSize/6));
+			while (newSum > (xValues[target] - fitOffset)*scale + fitOffset) {
+				if (newSum - ((xValues[target] - fitOffset)*scale + fitOffset) < (xValues[target] - fitOffset)*scale + fitOffset - sum) {
+					XToTMap[xValues[target]] = t;
+				} else {
+					XToTMap[xValues[target]] = t - stepSize;
+				}
+				target += 1;
+				if (target == xValues.Count) {
+					break;
+				}
+			}
+			t += stepSize;
+			sum = newSum;
+			prev = curr;
+		}
+		
+		if (XToTMap[xValues[xValues.Count-1]] > upper) {
+			return null;
+		}
+		//for (int i = 0; i < xValues.Count; i++) {
+		//	Debug.Log("x value: " + xValues[i].ToString() + ", t value: " + XToTMap[xValues[i]]);
+		//}
+		
+		//Dictionary<float, Vector3> XToNormalMap = new Dictionary<float, Vector3>();
+		
+		//List<float> tSteps = new List<float>();
+		//for (int i = 0; i < xValues.Count; i++) {
+		//	tSteps.Add(XToTMap[xValues[i]]);
+		//}
+		//tSteps.Add(upper);
+		//Vector3[] interpNormals = GetStepNormals(tSteps, normals);
+		
+		List<float> tSteps = new List<float>();
+		for (float i = lower; i < upper; i+= 0.01f) {
+			tSteps.Add(i);
+		}
+		tSteps.Add(upper);
+		Vector3[] interpNormals = GetStepNormals(tSteps, normals);
+		
+		//for (int i = 0; i < xValues.Count; i++) {
+		//	XToNormalMap[xValues[i]] = interpNormals[i];
+		//}
+		
+		Vector3[] newVertices = new Vector3[mesh.vertices.Length];
+		Vector2[] newUV = new Vector2[mesh.uv.Length];
+		int[] newTriangles = new int[mesh.triangles.Length];
+		Vector3[] newNormals = new Vector3[mesh.normals.Length];
+		
+		for (int i = 0; i < newVertices.Length; i++) {
+			t = XToTMap[mesh.vertices[i].x + fitOffset];
+			//Vector3 offsetY = XToNormalMap[mesh.vertices[i].x + fitOffset].normalized;
+			Vector3 offsetY = interpNormals[(int) Math.Floor(t*100)];
+			Vector3 offsetX = Vector3.Cross(direction(t), offsetY).normalized;
+			newVertices[i] = position(t) + (mesh.vertices[i].y + masterHeightOffset)*offsetY + (mesh.vertices[i].z + masterWidthOffset)*offsetX;
+			newUV[i] = mesh.uv[i];
+			newNormals[i] = mesh.normals[i].x*(direction(t).normalized) + mesh.normals[i].y*offsetY + mesh.normals[i].z*offsetX;
+		}
+		for (int i = 0; i < newTriangles.Length; i++) {
+			newTriangles[i] = mesh.triangles[i];
+		}
+		newMesh.vertices = newVertices;
+		newMesh.uv = newUV;
+		newMesh.triangles = newTriangles;
+		newMesh.normals = newNormals;
+		return newMesh;
+	}
+	
+	private void makeVertsAndFacesCustom() {
+		
+		//Vector2[] customPoints = {new Vector2(-4, 0), new Vector2(-5,0), new Vector2(-6,0), new Vector2(-6,2), new Vector2(-5,2), new Vector2(-4,1), new Vector2(4,1), new Vector2(5,2), new Vector2(6,2), new Vector2(6,0), new Vector2(5, 0), new Vector2(4, 0), new Vector2(-4, 0)};
+		//float[] customUV = {2, 3, 4, 6, 7, 8, 16, 17, 18, 20, 21, 22, 30};
+		
+		int numTSteps = (int) ((upper + step/2 - lower)/step) + 1;
+		List<float> stepList = null;
+		float lastUVAdjustment = 1;
+		if (evenStepLength) {
+			(List<float>, float) stepInfo = getTSteps();
+			stepList = stepInfo.Item1;
+			lastUVAdjustment = stepInfo.Item2;
+			numTSteps = stepList.Count;
+		}
+		
+		Vector3[] stepNormals = GetStepNormals(stepList, normals);
+		
+		int numWidthSteps = customPoints.Length;
+		
+		vertices = new Vector3[numTSteps*numWidthSteps*2 + customCap.Item1.Length*2];
+		uvs = new Vector2[vertices.Length];
+		meshNormals = new Vector3[vertices.Length];
+		int[,,] points = new int[numTSteps, numWidthSteps, 2];
+		
+		float totalArcLength = 0;
+		float lengthAdjustment = 1;
+		if (!evenStepLength) {
+			totalArcLength = ArcLength(lower, upper, NUM_INTERVALS*(numTSteps-1));
+			if (roundLength != 0) {
+				lengthAdjustment = (float) (roundLength*Math.Round(totalArcLength/roundLength) / totalArcLength);
+			}
+		}
+		
+		// vertices
+		float tPrev = 0;
+		
+		float arcLengthSum = 0;
+		int k = 0;
+		for (int i = 0; i < numTSteps; i++) {
+			float t = i*step + lower;
+			if (evenStepLength) t = stepList[i];
+			
+			Vector3 currPosition = position(t);
+			Vector3 currDirection = direction(t);
+			
+			Vector3 offsetHeight = stepNormals[i];
+			Vector3 offset = Vector3.Cross(currDirection, offsetHeight).normalized;
+			
+			float arcLength = 0;
+			if (!evenStepLength) {
+				arcLength = ArcLength(tPrev, t, NUM_INTERVALS);
+				arcLengthSum += arcLength;
+			}
+			tPrev = t;
+			
+			for (int j = 0; j < numWidthSteps; j++) {
+				
+				Vector3 finalOffset = offset*(customPoints[j].x + masterWidthOffset) + offsetHeight*(customPoints[j].y + masterHeightOffset);
+				Vector3 finalPosition = currPosition + finalOffset;
+				int firstK = k;
+				points[i,j,0] = k;
+				if (evenStepLength) {
+					float uvAdjustment = 1;
+					if (i == numTSteps-1) {
+						uvAdjustment = lastUVAdjustment;
+					}
+					//uvs[k] = new Vector2(0, 0);
+					uvs[k] = new Vector2(((i-1)*stepLength + stepLength*uvAdjustment)*uvScale[0] + uvOffset[0], customUVs[j].Item1);
+				} else {
+					//uvs[k] = new Vector2(0, 0);
+					uvs[k] = new Vector2(arcLengthSum*lengthAdjustment*uvScale[0] + uvOffset[0], customUVs[j].Item1);
+				}
+				meshNormals[k] = customNormals[j].Item1.y*offsetHeight + customNormals[j].Item1.x*offset;
+				vertices[k++] = finalPosition;
+				
+				points[i,j,1] = k;
+				uvs[k] = new Vector2(uvs[k-1].x, customUVs[j].Item2);
+				meshNormals[k] = customNormals[j].Item2.y*offsetHeight + customNormals[j].Item2.x*offset;
+				vertices[k++] = finalPosition;
+				
+				//if (j == 0 || j == numWidthSteps-1) {
+				//	points[i,j,2] = k;
+				//	uvs[k] = uvs[firstK] + new Vector2(0, height*uvScale[2]);
+				//	vertices[k++] = finalPosition - offsetHeight*height;
+				//}
+				
+				//if (i == 0 || i == numTSteps-1) {
+				//	points[i,j,3] = k;
+				//	uvs[k] = uvs[firstK] + new Vector2(height*uvScale[2], 0);
+				//	vertices[k++] = finalPosition - offsetHeight*height;
+				//}
+			}
+		}
+		
+		int capIndexStart = k;
+		Vector3 offsetY = normals[0];
+		Vector3 offsetX = Vector3.Cross(direction(0), offsetY);
+		for (int i = 0; i < customCap.Item1.Length; i++) {
+			vertices[k] = position(0) + (customCap.Item1[i].y + masterHeightOffset)*offsetY + (customCap.Item1[i].z + masterWidthOffset)*offsetX;
+			meshNormals[k] = (-direction(0)).normalized;
+			uvs[k++] = customCap.Item2[i];
+		}
+		
+		int capIndexEnd = k;
+		offsetY = normals[normals.Length-1];
+		offsetX = Vector3.Cross(direction(normals.Length-1), offsetY);
+		for (int i = 0; i < customCap.Item1.Length; i++) {
+			vertices[k] = position(normals.Length-1) + (customCap.Item1[i].y + masterHeightOffset)*offsetY + (customCap.Item1[i].z + masterWidthOffset)*offsetX;
+			meshNormals[k] = direction(normals.Length-1);
+			uvs[k++] = customCap.Item2[i];
+		}
+		
+		triangles = new int[(numTSteps*numWidthSteps*4-4)*3 + customCap.Item3.Length*2];
+		
+		// faces
+		k = 0;
+		for (int i = 0; i < numTSteps; i++) {
+			for (int j = 0; j < numWidthSteps; j++) {
+					
+				if (i > 0 && j > 0) {
+					triangles[k++] = points[i,j,0];
+					triangles[k++] = points[i,j-1,1];
+					triangles[k++] = points[i-1,j,0];
+				}
+				if (i < numTSteps-1 && j < numWidthSteps-1) {
+					triangles[k++] = points[i,j,1];
+					triangles[k++] = points[i,j+1,0];
+					triangles[k++] = points[i+1,j,1];
+				}
+			}
+		}
+		
+		for (int i = 0; i < customCap.Item3.Length; i++) {
+			triangles[k++] = customCap.Item3[i] + capIndexStart;
+		}
+		
+		for (int i = 0; i < customCap.Item3.Length; i += 3) {
+			for (int j = 2; j >= 0; j--) {
+				triangles[k++] = customCap.Item3[i+j] + capIndexEnd;
+			}
+		}
+	}
+	
 	private void makeVertsAndFacesBox() {
 
 		int numTSteps = (int) ((upper + step/2 - lower)/step) + 1;
@@ -344,9 +612,10 @@ public class ParametricCurve {
 		List<float> widthStepList = GetWidthSteps();
 		int numWidthSteps = widthStepList.Count;
 	
-		vertices = new Vector3[numTSteps*numWidthSteps*2 + numTSteps*2 + numWidthSteps*2];
+		vertices = new Vector3[numTSteps*numWidthSteps*2 + numTSteps*4 + numWidthSteps*4];
 		uvs = new Vector2[vertices.Length];
-		int[,,] points = new int[numTSteps, numWidthSteps, 4];
+		meshNormals = new Vector3[vertices.Length];
+		int[,,] points = new int[numTSteps, numWidthSteps, 6];
 		
 		float totalArcLength = 0;
 		float lengthAdjustment = 1;
@@ -395,22 +664,36 @@ public class ParametricCurve {
 				} else {
 					uvs[k] = new Vector2(arcLengthSum*lengthAdjustment*uvScale[0] + uvOffset[0], widthPosition*uvScale[1] + uvOffset[1]);
 				}
+				meshNormals[k] = offsetHeight;
 				vertices[k++] = finalPosition;
 				
 				points[i,j,1] = k;
 				uvs[k] = uvs[k-1];
+				meshNormals[k] = -offsetHeight;
 				vertices[k++] = finalPosition - offsetHeight*height;
 				
 				if (j == 0 || j == numWidthSteps-1) {
 					points[i,j,2] = k;
-					uvs[k] = uvs[firstK] + new Vector2(0, height*uvScale[2]);
+					uvs[k] = new Vector2(uvs[firstK].x, uvOffset[2] + height*uvScale[2]);
+					meshNormals[k] = (j == 0) ? -offset : offset;
 					vertices[k++] = finalPosition - offsetHeight*height;
+					
+					points[i,j,4] = k;
+					uvs[k] = new Vector2(uvs[firstK].x, uvOffset[2]);
+					meshNormals[k] = (j == 0) ? -offset : offset;
+					vertices[k++] = finalPosition;
 				}
 				
 				if (i == 0 || i == numTSteps-1) {
 					points[i,j,3] = k;
-					uvs[k] = uvs[firstK] + new Vector2(height*uvScale[2], 0);
+					uvs[k] = new Vector2(uvOffset[2] + height*uvScale[2], uvs[firstK].y);
+					meshNormals[k] = (i == 0) ? (-currDirection).normalized : currDirection.normalized;
 					vertices[k++] = finalPosition - offsetHeight*height;
+					
+					points[i,j,5] = k;
+					uvs[k] = new Vector2(uvOffset[2], uvs[firstK].y);
+					meshNormals[k] = (i == 0) ? (-currDirection).normalized : currDirection.normalized;
+					vertices[k++] = finalPosition;
 				}
 				
 			}
@@ -424,48 +707,48 @@ public class ParametricCurve {
 			for (int j = 0; j < numWidthSteps; j++) {
 				if (i == 0 && startFace) {
 					if (j > 0) {
-						triangles[k++] = points[i,j,0];
-						triangles[k++] = points[i,j-1,0];
+						triangles[k++] = points[i,j,5];
+						triangles[k++] = points[i,j-1,5];
 						triangles[k++] = points[i,j,3];
 					}
 					if (j < numWidthSteps-1) {
-						triangles[k++] = points[i,j,0];
+						triangles[k++] = points[i,j,5];
 						triangles[k++] = points[i,j,3];
 						triangles[k++] = points[i,j+1,3];
 					}
 				}
 				if (i == numTSteps-1 && endFace) {
 					if (j > 0) {
-						triangles[k++] = points[i,j,0];
+						triangles[k++] = points[i,j,5];
 						triangles[k++] = points[i,j,3];
-						triangles[k++] = points[i,j-1,0];
+						triangles[k++] = points[i,j-1,5];
 					}
 					if (j < numWidthSteps-1) {
-						triangles[k++] = points[i,j,0];
+						triangles[k++] = points[i,j,5];
 						triangles[k++] = points[i,j+1,3];
 						triangles[k++] = points[i,j,3];
 					}
 				}
 				if (j == 0 && rightFace) {
 					if (i > 0) { 
-						triangles[k++] = points[i,j,0];
+						triangles[k++] = points[i,j,4];
 						triangles[k++] = points[i,j,2];
-						triangles[k++] = points[i-1,j,0];
+						triangles[k++] = points[i-1,j,4];
 					}
 					if (i < numTSteps-1) {
-						triangles[k++] = points[i,j,0];
+						triangles[k++] = points[i,j,4];
 						triangles[k++] = points[i+1,j,2];
 						triangles[k++] = points[i,j,2];
 					}
 				}
 				if (j == numWidthSteps-1 && leftFace) {
 					if (i > 0) {
-						triangles[k++] = points[i,j,0];
-						triangles[k++] = points[i-1,j,0];
+						triangles[k++] = points[i,j,4];
+						triangles[k++] = points[i-1,j,4];
 						triangles[k++] = points[i,j,2];
 					}
 					if (i < numTSteps-1) {
-						triangles[k++] = points[i,j,0];
+						triangles[k++] = points[i,j,4];
 						triangles[k++] = points[i,j,2];
 						triangles[k++] = points[i+1,j,2];
 					}
@@ -515,9 +798,10 @@ public class ParametricCurve {
 		//List<float> widthStepList = GetWidthSteps();
 		int numWidthSteps = divisions;
 	
-		vertices = new Vector3[numTSteps*(numWidthSteps+1)*2 + (numWidthSteps+1)*2];
+		vertices = new Vector3[numTSteps*(numWidthSteps+1)*2 + (numWidthSteps+1)*4];
 		uvs = new Vector2[vertices.Length];
-		int[,,] points = new int[numTSteps, numWidthSteps+1, 3];
+		meshNormals = new Vector3[vertices.Length];
+		int[,,] points = new int[numTSteps, numWidthSteps+1, 4];
 		
 		float totalArcLength = 0;
 		float lengthAdjustment = 1;
@@ -574,16 +858,24 @@ public class ParametricCurve {
 				} else {
 					uvs[k] = new Vector2(arcLengthSum*lengthAdjustment*uvScale[0] + uvOffset[0], widthPosition*circumference*uvScale[1] + uvOffset[1]);
 				}
+				meshNormals[k] = -offset;
 				vertices[k++] = finalPosition;
 				
 				points[i,j,1] = k;
 				uvs[k] = uvs[firstK];
+				meshNormals[k] = offset;
 				vertices[k++] = finalPosition + offset*(outerRadius - innerRadius);
 				
 				if (i == 0 || i == numTSteps-1) {
 					points[i,j,2] = k;
-					uvs[k] = uvs[firstK] + new Vector2((outerRadius - innerRadius)*uvScale[2], 0);
+					uvs[k] = new Vector2(uvOffset[2] + (outerRadius - innerRadius)*uvScale[2], uvs[firstK].y);
+					meshNormals[k] = (i == 0) ? (-currDirection.normalized) : currDirection.normalized;
 					vertices[k++] = finalPosition + offset*(outerRadius - innerRadius);
+					
+					points[i,j,3] = k;
+					uvs[k] = new Vector2(uvOffset[2], uvs[firstK].y);
+					meshNormals[k] = (i == 0) ? (-currDirection.normalized) : currDirection.normalized;
+					vertices[k++] = finalPosition;
 				}
 			}
 		}
@@ -599,32 +891,32 @@ public class ParametricCurve {
 			for (int j = 0; j < numWidthSteps; j++) {	
 				if (i == 0) {
 					if (j > 0) {
-						triangles[k++] = points[i,j,0];
-						triangles[k++] = points[i,j-1,0];
+						triangles[k++] = points[i,j,3];
+						triangles[k++] = points[i,j-1,3];
 						triangles[k++] = points[i,j,2];
 					}
-					triangles[k++] = points[i,j,0];
+					triangles[k++] = points[i,j,3];
 					triangles[k++] = points[i,j,2];
 					triangles[k++] = points[i,j+1,2];
 					if (j == numWidthSteps-1) {
-						triangles[k++] = points[i,j+1,0];
-						triangles[k++] = points[i,j,0];
+						triangles[k++] = points[i,j+1,3];
+						triangles[k++] = points[i,j,3];
 						triangles[k++] = points[i,j+1,2];
 					}
 				}
 				if (i == numTSteps-1) {
 					if (j > 0) {
-						triangles[k++] = points[i,j,0];
+						triangles[k++] = points[i,j,3];
 						triangles[k++] = points[i,j,2];
-						triangles[k++] = points[i,j-1,0];
+						triangles[k++] = points[i,j-1,3];
 					}
-					triangles[k++] = points[i,j,0];
+					triangles[k++] = points[i,j,3];
 					triangles[k++] = points[i,j+1,2];
 					triangles[k++] = points[i,j,2];
 					if (j == numWidthSteps-1) {
-						triangles[k++] = points[i,j+1,0];
+						triangles[k++] = points[i,j+1,3];
 						triangles[k++] = points[i,j+1,2];
-						triangles[k++] = points[i,j,0];
+						triangles[k++] = points[i,j,3];
 					}
 				}
 				if (i > 0) {

@@ -17,7 +17,7 @@ public class CurveMaker : EditorWindow
 	private int nodePosition = 1;
 	
 	// strings for gui displays
-	string[] shapeModeStrings = {"rectangle", "tube"};
+	string[] shapeModeStrings = {"rectangle", "tube", "custom", "fit to curve"};
 	string[] angleModeStrings = {"linear", "smooth"};
 	string[] uvLabelStrings = {"Length", "Width", "Height"};
 	// postion for gui scrollViews
@@ -39,7 +39,7 @@ public class CurveMaker : EditorWindow
 
 	// get the position, direction, or normal vector from a node
 	private Vector3 NodePosition(int i) {
-		return nodes[i].GetComponent<Transform>().position;
+		return nodes[i].GetComponent<Transform>().position - nodes[0].GetComponent<Transform>().position;
 	}
 	private Vector3 NodeDirection(int i) {
 		return nodes[i].GetComponent<Transform>().right;
@@ -75,7 +75,7 @@ public class CurveMaker : EditorWindow
 	private float[] NodePositionsDimension(int dimension) {
 		float[] positions = new float[nodes.Count];
 		for (int i = 0; i < nodes.Count; i++) {
-			positions[i] = nodes[i].GetComponent<Transform>().position[dimension];
+			positions[i] = nodes[i].GetComponent<Transform>().position[dimension] - nodes[0].GetComponent<Transform>().position[dimension];
 		}
 		return positions;
 	}
@@ -246,32 +246,80 @@ public class CurveMaker : EditorWindow
 		curve.SetUVOffset(ni.uvOffset);
 		curve.SetNormals(NodeNormals());
 		curve.SetAngleInterpolationMode(ni.angleInterpolationMode);
-				
-		float[] angles = new float[nodes.Count];
-		float[] angleChanges = new float[nodes.Count];
-		for (int i = 0; i < nodes.Count; i++) {
-			angles[i] = curve.AngleFromVector(nodes[i].transform.up, i);
-			angleChanges[i] = 0;
+		
+		if (ni.shapeMode == 2) {
+			if (ni.customObject == null) {
+				message = "No cross section object is selected";
+				return;
+			}
+			Mesh m = ni.customObject.GetComponent<MeshFilter>().sharedMesh;
+			if (m == null) {
+				message = "The selected cross section object has no mesh";
+				return;
+			}
+			(Vector2[], List<(float, float)>, List<(Vector2, Vector2)>, (Vector3[], Vector2[], int[])) result = ProcessMesh.GetPointsUVsAndCap(m);
+			if (result.Item1 == null) {
+				message = "The selected object has no valid cross section (make sure pivot is in the right place)";
+				return;
+			}
+			//for (int i = 0; i < result.Item1.Length; i++) {
+			//	Debug.Log("point #" + i.ToString() + ": " + result.Item1[i].ToString() + " | Normals: " + result.Item3[i].Item1.ToString() + ",  " + result.Item3[i].Item2.ToString());
+			//}
+			curve.SetCustom(result.Item1, result.Item2, result.Item3, result.Item4);
 		}
-		(Func<float, float>, Func<float, float>) thetas = Bezier.LambdasFromNodes(angles, angleChanges);
-		curve.SetTheta(thetas.Item1);
+		if (ni.shapeMode == 3) {
+			if (ni.customObject == null) {
+				message = "No object to fit is selected";
+				return;
+			}
+			curve.SetFitObject(ni.customObject, ni.fitOffset, ni.stretchToCurve);
+			Mesh newMesh = curve.FitToCurve();
+			if (newMesh == null) {
+				message = "The object is too big for the curve";
+				return;
+			}
+			GameObject EmptyObj = new GameObject("Curve");
+			EmptyObj.transform.position = nodes[0].transform.position;
+			MeshFilter mf = EmptyObj.AddComponent(typeof(MeshFilter)) as MeshFilter;
+			MeshCollider mc = EmptyObj.AddComponent<MeshCollider>();
+			newMesh.name = "curveMesh";
+			mf.sharedMesh = newMesh;
+			mc.sharedMesh = newMesh;
 			
-		curve.makeVertsAndFaces();
-			
-		GameObject EmptyObj = new GameObject("Curve");
-			
-		Mesh mesh = new Mesh();
-		MeshFilter mf = EmptyObj.AddComponent(typeof(MeshFilter)) as MeshFilter;
-		MeshCollider mc = EmptyObj.AddComponent<MeshCollider>();
-		mesh.vertices = curve.vertices;
-		mesh.uv = curve.uvs;
-		mesh.triangles = curve.triangles;
-		mesh.name = "curveMesh";
-		mf.sharedMesh = mesh;
-		mc.sharedMesh = mesh;
+			MeshRenderer mr = EmptyObj.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
+			mr.sharedMaterial = Resources.Load("CurveDefault") as Material;
+		}
 				
-		MeshRenderer mr = EmptyObj.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
-		mr.sharedMaterial = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Material.mat");
+		if (ni.shapeMode != 3) {
+			float[] angles = new float[nodes.Count];
+			float[] angleChanges = new float[nodes.Count];
+			for (int i = 0; i < nodes.Count; i++) {
+				angles[i] = curve.AngleFromVector(nodes[i].transform.up, i);
+				angleChanges[i] = 0;
+			}
+			(Func<float, float>, Func<float, float>) thetas = Bezier.LambdasFromNodes(angles, angleChanges);
+			curve.SetTheta(thetas.Item1);
+			
+			curve.makeVertsAndFaces();
+		
+			
+			GameObject EmptyObj = new GameObject("Curve");
+			
+			EmptyObj.transform.position = nodes[0].transform.position;
+			Mesh mesh = new Mesh();
+			MeshFilter mf = EmptyObj.AddComponent(typeof(MeshFilter)) as MeshFilter;
+			MeshCollider mc = EmptyObj.AddComponent<MeshCollider>();
+			mesh.vertices = curve.vertices;
+			mesh.uv = curve.uvs;
+			mesh.triangles = curve.triangles;
+			mesh.normals = curve.meshNormals;
+			mesh.name = "curveMesh";
+			mf.sharedMesh = mesh;
+			mc.sharedMesh = mesh;
+			
+			MeshRenderer mr = EmptyObj.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
+			mr.sharedMaterial = Resources.Load("CurveDefault") as Material;
+		}	
 			
 		message = "Curve Created Successfully";
 	}
@@ -343,55 +391,80 @@ public class CurveMaker : EditorWindow
 		
 		EditorGUILayout.BeginHorizontal();
 		UnityEditor.EditorGUIUtility.labelWidth = 1;
-		EditorGUILayout.LabelField("Shape:");
+		EditorGUILayout.LabelField("Mode:");
 		ni.shapeMode = GUILayout.SelectionGrid(ni.shapeMode, shapeModeStrings, 2);
 		EditorGUILayout.EndHorizontal();
+		EditorGUILayout.Space();
 		
-		
-		EditorGUILayout.BeginHorizontal();
-		if (ni.shapeMode == 0) {
-			UnityEditor.EditorGUIUtility.labelWidth = 50;
-			ni.width = EditorGUILayout.FloatField("Width:", ni.width);
-		} else {
+		if (ni.shapeMode == 3) {
+			UnityEditor.EditorGUIUtility.labelWidth = 90;
+			ni.customObject = EditorGUILayout.ObjectField("Object To Fit:", ni.customObject, typeof(GameObject), true) as GameObject;
+			ni.fitOffset = EditorGUILayout.FloatField("Offset:", ni.fitOffset);
+			UnityEditor.EditorGUIUtility.labelWidth = 140;
+			ni.stretchToCurve = EditorGUILayout.Toggle("Stretch to Fit Curve:", ni.stretchToCurve);
+		} else if (ni.shapeMode == 2) {
+			UnityEditor.EditorGUIUtility.labelWidth = 90;
+			ni.customObject = EditorGUILayout.ObjectField("Cross Section:", ni.customObject, typeof(GameObject), true) as GameObject;
+			EditorGUILayout.BeginHorizontal();
 			UnityEditor.EditorGUIUtility.labelWidth = 80;
-			ni.innerRadius = EditorGUILayout.FloatField("Inner Radius:", ni.innerRadius);
-		}
-		UnityEditor.EditorGUIUtility.labelWidth = 80;
-		ni.widthOffset = EditorGUILayout.FloatField("Width Offset:", ni.widthOffset);
-		EditorGUILayout.EndHorizontal();
-		
-		EditorGUILayout.BeginHorizontal();
-		if (ni.shapeMode == 0) {
-			UnityEditor.EditorGUIUtility.labelWidth = 50;
-			ni.height = EditorGUILayout.FloatField("Height:", ni.height);
-		} else {
-			UnityEditor.EditorGUIUtility.labelWidth = 80;
-			ni.outerRadius = EditorGUILayout.FloatField("Outer Radius:", ni.outerRadius);
-		}
-		UnityEditor.EditorGUIUtility.labelWidth = 80;
-		ni.heightOffset = EditorGUILayout.FloatField("Height Offset:", ni.heightOffset);
-		EditorGUILayout.EndHorizontal();
-		
-		UnityEditor.EditorGUIUtility.labelWidth = 140;
+			ni.widthOffset = EditorGUILayout.FloatField("Width Offset:", ni.widthOffset);
+			ni.heightOffset = EditorGUILayout.FloatField("Height Offset:", ni.heightOffset);
+			EditorGUILayout.EndHorizontal();
+			UnityEditor.EditorGUIUtility.labelWidth = 140;
 		ni.lengthStepSize = EditorGUILayout.FloatField("Length Step Size:", ni.lengthStepSize);
 		ni.lengthStepSize = Math.Max(ni.lengthStepSize, 0.01f);
-		if (ni.shapeMode == 0) {
-			ni.widthStepSize = EditorGUILayout.FloatField("Width Step Size:", ni.widthStepSize);
 		} else {
-			ni.divisions = EditorGUILayout.IntField("Divisions:", ni.divisions);
-		}
-		ni.widthStepSize = Math.Max(ni.widthStepSize, 0.01f);
-		ni.roundLength = Math.Abs(EditorGUILayout.IntField("Round Tile to nearest:", ni.roundLength));
-		
-		EditorGUILayout.Space();
-		EditorGUILayout.LabelField("UVs:");
-		for (int i = 0; i < 3; i++) {
-			UnityEditor.EditorGUIUtility.labelWidth = 90;
 			EditorGUILayout.BeginHorizontal();
-			ni.uvScale[i] = EditorGUILayout.FloatField(uvLabelStrings[i] + "- Scale:", ni.uvScale[i]);
-			UnityEditor.EditorGUIUtility.labelWidth = 40;
-			if (i != 2) ni.uvOffset[i] = EditorGUILayout.FloatField("Offset:", ni.uvOffset[i]);
+			if (ni.shapeMode == 0) {
+				UnityEditor.EditorGUIUtility.labelWidth = 50;
+				ni.width = EditorGUILayout.FloatField("Width:", ni.width);
+			} else {
+				UnityEditor.EditorGUIUtility.labelWidth = 80;
+				ni.innerRadius = EditorGUILayout.FloatField("Inner Radius:", ni.innerRadius);
+			}
+			UnityEditor.EditorGUIUtility.labelWidth = 80;
+			ni.widthOffset = EditorGUILayout.FloatField("Width Offset:", ni.widthOffset);
 			EditorGUILayout.EndHorizontal();
+		
+			EditorGUILayout.BeginHorizontal();
+			if (ni.shapeMode == 0) {
+				UnityEditor.EditorGUIUtility.labelWidth = 50;
+				ni.height = EditorGUILayout.FloatField("Height:", ni.height);
+			} else {
+				UnityEditor.EditorGUIUtility.labelWidth = 80;
+				ni.outerRadius = EditorGUILayout.FloatField("Outer Radius:", ni.outerRadius);
+			}
+			UnityEditor.EditorGUIUtility.labelWidth = 80;
+			ni.heightOffset = EditorGUILayout.FloatField("Height Offset:", ni.heightOffset);
+			EditorGUILayout.EndHorizontal();
+		
+			UnityEditor.EditorGUIUtility.labelWidth = 140;
+			ni.lengthStepSize = EditorGUILayout.FloatField("Length Step Size:", ni.lengthStepSize);
+			ni.lengthStepSize = Math.Max(ni.lengthStepSize, 0.01f);
+			if (ni.shapeMode == 0) {
+				ni.widthStepSize = EditorGUILayout.FloatField("Width Step Size:", ni.widthStepSize);
+			} else {
+				ni.divisions = EditorGUILayout.IntField("Divisions:", ni.divisions);
+			}
+		}
+		
+		if (ni.shapeMode != 3) {
+			UnityEditor.EditorGUIUtility.labelWidth = 140;
+			ni.widthStepSize = Math.Max(ni.widthStepSize, 0.01f);
+			ni.roundLength = Math.Abs(EditorGUILayout.IntField("Round Tile to nearest:", ni.roundLength));
+		
+			EditorGUILayout.Space();
+			EditorGUILayout.LabelField("UVs:");
+			for (int i = 0; i < 3; i++) {
+				if (i == 0 || ni.shapeMode != 2) {
+					UnityEditor.EditorGUIUtility.labelWidth = 90;
+					EditorGUILayout.BeginHorizontal();
+					ni.uvScale[i] = EditorGUILayout.FloatField(uvLabelStrings[i] + "- Scale:", ni.uvScale[i]);
+					UnityEditor.EditorGUIUtility.labelWidth = 40;
+					ni.uvOffset[i] = EditorGUILayout.FloatField("Offset:", ni.uvOffset[i]);
+					EditorGUILayout.EndHorizontal();
+				}
+			}
 		}
 		EditorGUILayout.Space();
 		
@@ -433,22 +506,25 @@ public class CurveMaker : EditorWindow
 		ni.angleInterpolationMode = GUILayout.SelectionGrid(ni.angleInterpolationMode, angleModeStrings, 2);
 		EditorGUILayout.EndHorizontal();
 		
-		UnityEditor.EditorGUIUtility.labelWidth = 50;
-		EditorGUILayout.LabelField("Include faces:");
-		EditorGUILayout.BeginHorizontal();
-		ni.topFace = EditorGUILayout.Toggle("Top:", ni.topFace);
-		ni.leftFace = EditorGUILayout.Toggle("Left:", ni.leftFace);
-		ni.startFace = EditorGUILayout.Toggle("Start:", ni.startFace);
-		EditorGUILayout.EndHorizontal();
-		EditorGUILayout.BeginHorizontal();
-		ni.bottomFace = EditorGUILayout.Toggle("Bottom:", ni.bottomFace);
-		ni.rightFace = EditorGUILayout.Toggle("Right:", ni.rightFace);
-		ni.endFace = EditorGUILayout.Toggle("End:", ni.endFace);
-		EditorGUILayout.EndHorizontal();
+		if (ni.shapeMode == 0 || ni.shapeMode == 1) {
+			UnityEditor.EditorGUIUtility.labelWidth = 50;
+			EditorGUILayout.LabelField("Include faces:");
+			EditorGUILayout.BeginHorizontal();
+			ni.topFace = EditorGUILayout.Toggle("Top:", ni.topFace);
+			ni.leftFace = EditorGUILayout.Toggle("Left:", ni.leftFace);
+			ni.startFace = EditorGUILayout.Toggle("Start:", ni.startFace);
+			EditorGUILayout.EndHorizontal();
+			EditorGUILayout.BeginHorizontal();
+			ni.bottomFace = EditorGUILayout.Toggle("Bottom:", ni.bottomFace);
+			ni.rightFace = EditorGUILayout.Toggle("Right:", ni.rightFace);
+			ni.endFace = EditorGUILayout.Toggle("End:", ni.endFace);
+			EditorGUILayout.EndHorizontal();
+		}
 		
 		if (GUILayout.Button("Make Curve")) {
 			MakeCurve();
 		}
+		
 		
 		EditorGUILayout.LabelField(message);
 

@@ -9,6 +9,9 @@ public class NodeInfo : MonoBehaviour
 	public float height = 1;
 	public float innerRadius = 4;
 	public float outerRadius = 5;
+	public GameObject customObject = null;
+	public float fitOffset = 0;
+	public bool stretchToCurve = false;
 	public int divisions = 16;
 	public float widthOffset = 0;
 	public float heightOffset = 0;
@@ -16,7 +19,7 @@ public class NodeInfo : MonoBehaviour
 	public float widthStepSize = 1;
 	public int roundLength = 4;
 	public Vector3 uvScale = new Vector3(1,1,1);
-	public Vector3 uvOffset = new Vector2(0,0);
+	public Vector3 uvOffset = new Vector3(0,0,0);
 	public float nodeSmoothness = 30;
 	public int angleInterpolationMode = 1;
 	public bool topFace = true;
