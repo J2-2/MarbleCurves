@@ -15,8 +15,10 @@ Delete the node from the currently selected set of nodes at the position specifi
 Add a node to the currently selected set of nodes at the position specified by __Position__.
 
 ### Shape
-__rectange__: The cross section of the curve will be a rectangle.  
-__tube__: The cross section of the curve will be a circle.
+__rectange__: The cross section of the curve will be a rectangle.    
+__tube__: The cross section of the curve will be a circle.    
+__custom__: The cross section of the curve will be based on the object set in __Cross Section__. The cross section will be made from the edges at x position 0 relative to the pivot of the object so make sure the pivot is in the right place.    
+__fit to curve__: The curve will be made by bending the object set in __Object to Fit__ to the curve. __Offset__ is the offset to where the object starts being fit  to the curve. __Stretch to Fit Curve__ will make the end of the object line up with the end of the curve. If the object is longer than the curve make sure to select __Stretch to Fit Curve__ so it will fit.
 
 ### Width/Height
 The width and height that the rectangle cross section of the curve will have when in __rectangle__ mode.
