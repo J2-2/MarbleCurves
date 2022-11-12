@@ -61,3 +61,9 @@ Which faces of the curve to include in the final mesh.
 
 ### Make Curve
 Create the curve object based on the currently selected nodes and the parameters selected.
+
+## Credits
+
+Made By J2_2
+
+Special Thanks to Hyran for his help testing
