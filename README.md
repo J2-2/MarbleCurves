@@ -161,9 +161,9 @@ __Length Step Size:__
 This controls the length the faces that the curve will be subdivided into. The smaller the size the length smoother the geometry will be but the curve will take up more memory and take longer to make. Using larger face sizes can create a jagged edge on the curve.
 
 <table><tr>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step0.5.png?raw=true" alt="Length Step 0.5" style="width: 350px;"/> </td>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step1.png?raw=true" alt="Length Step 1" style="width: 350px;"/> </td>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step4.png?raw=true" alt="Length Step 4" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step_t0.5.png?raw=true" alt="Length Step 0.5" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step_t1.png?raw=true" alt="Length Step 1" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step_t4.png?raw=true" alt="Length Step 4" style="width: 350px;"/> </td>
 </tr>
 <tr>
   <td>Length Step Size is 0.5</td>
@@ -183,6 +183,21 @@ This controls the numbers of faces the circumference of the circle will be made 
   <td>32 Divisions</td>
   <td>16 Divisions</td>
   <td>8 Divisions</td>
+</tr></table>
+
+
+__Round Tile to Nearest:__  
+This controls how the faces that make up the curve and the uvs are rounded to better fit the curve. For example if there is a curve of length 21.4 when __Round Tile to Nearest__ is set to 0 no rounding will occur so the curve will have 21 tiles plus a last tile of length 0.4 the rest of the tiles. If __Round Tile to Nearest__ is set to 1 then the curve will be rounded to length 21 so it will have 21 tiles. If __Round Tile to Nearest__ is set to 4 then the curve will be rounded to length 20 and have 20 tiles.
+
+<table><tr>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/round0.png?raw=true" alt="Round 0" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/round1.png?raw=true" alt="Round 1" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/round4.png?raw=true" alt="Round 4" style="width: 350px;"/> </td>
+</tr>
+<tr>
+  <td>Round Tile to Nearest is 0</td>
+  <td>Round Tile to Nearest is 1</td>
+  <td>Round Tile to Nearest is 4</td>
 </tr></table>
 
 ### Shape
