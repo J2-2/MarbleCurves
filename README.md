@@ -53,7 +53,7 @@ Sets the orientation and node smoothness of each node except for the first and l
 
 Ractangle mode can be selected by choosing the __rectangle__ option in the mode selector. This mode make it so that the cross section of the curve will be a rectangle with dimensions specified by __width__ and __height__. The middle of the curve will be centered on the top edge of the rectangle.
 
-__<ins>Parameters</ins>_
+__<ins>Parameters</ins>__
 
 __Width/Height:__  
 These control the width and height of the cross section of the curve.
@@ -83,8 +83,24 @@ These control how offset the cross section is from the center of the curve. When
   <td>Width Offset is 0 and Height Offset is 0.5</td>
 </tr></table>
 
-__Length Step Size/Width Step Size:__
+__Length Step Size/Width Step Size:__  
 These control the dimensions of the faces that the curve will be subdivided into. The smaller the size the smoother the geometry will be but the curve will take up more memory and take longer to make. Using larger face sizes can create a jagged edge on the curve.
+
+<table border="0"><tr>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step0.5.png?raw=true" alt="Length Step 0.5" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step1.png?raw=true" alt="Length Step 1" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step4.png?raw=true" alt="Length Step 4" style="width: 350px;"/> </td>
+</tr>
+<tr>
+  <td>Length Step Size is 0.5</td>
+  <td>Length Step Size is 1</td>
+  <td>Length Step Size is 4</td>
+</tr></table>
+
+__Round Tile to Nearest:__  
+This controls how the faces that make up the curve and the uvs are rounded to better fit the curve. For example if there is a curve of length 21.4 when __Round Tile to Nearest__ is set to 0 no rounding will occur so the curve will have 21 tiles plus a last tile of length 0.4 the rest of the tiles. If __Round Tile to Nearest__ is set to 1 then the curve will be rounded to length 21 so it will have 21 tiles. If __Round Tile to Nearest__ is set to 4 then the curve will be rounded to length 20 and have 20 tiles.
+
+
 
 ### Shape
 __rectange__: The cross section of the curve will be a rectangle.    
