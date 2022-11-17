@@ -28,6 +28,17 @@ Add a node to the currently selected set of nodes at the position specified by _
 
 Node smoothness value is a property of each node that determines how straight the curve will be at that node. The higher the smoothness value the straighter the curve. Here is an example of 3 curves with nodes in the same postion but with different Smoothness Values.
 
+<table border="0"><tr>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/Nodes.png?raw=true" alt="Smoothness 20" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/Nodes.png?raw=true" alt="Smoothness 30" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/Nodes.png?raw=true" alt="Smoothness 50" style="width: 350px;"/> </td>
+</tr>
+<tr>
+  <td>Node smoothness is 20 for all nodes</td>
+  <td>Node smoothness is 30 for all nodes</td>
+  <td>Node smoothness is 50 for all nodes</td>
+</tr></table>
+
 ### Rectangle Mode
 
 Ractangle mode can be selected by choosing the __rectangle__ option in the mode selector. This mode make it so that the cross section of the curve will be a rectangle with dimensions specified by __width__ and __height__
