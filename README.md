@@ -83,6 +83,9 @@ These control how offset the cross section is from the center of the curve. When
   <td>Width Offset is 0 and Height Offset is 0.5</td>
 </tr></table>
 
+__Length Step Size/Width Step Size:__
+These control the dimensions of the faces that the curve will be subdivided into. The smaller the size the smoother the geometry will be but the curve will take up more memory and take longer to make. Using larger face sizes can create a jagged edge on the curve.
+
 ### Shape
 __rectange__: The cross section of the curve will be a rectangle.    
 __tube__: The cross section of the curve will be a circle.    
