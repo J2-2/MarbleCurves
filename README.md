@@ -58,7 +58,7 @@ __<ins>Parameters</ins>__
 __Width/Height:__  
 These control the width and height of the cross section of the curve.
 
-<table border="0"><tr>
+<table><tr>
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/width8height1.png?raw=true" alt="Width 8, Height 1" style="width: 350px;"/> </td>
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/width4height4.png?raw=true" alt="Width 4, Height 4" style="width: 350px;"/> </td>
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/width1height2.png?raw=true" alt="Width 1, Height 2" style="width: 350px;"/> </td>
@@ -72,7 +72,7 @@ These control the width and height of the cross section of the curve.
 __Width Offset/Height Offset__:
 These control how offset the cross section is from the center of the curve. When set to 0 and 0 the center of the curve is positioned in the middle of the top edge of the rectangle cross section. 
 
-<table border="0"><tr>
+<table><tr>
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset2_0.png?raw=true" alt="Width Offset 2, Height Offset 0" style="width: 350px;"/> </td>
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset-4_4.png?raw=true" alt="Width Offset -4, Height Offset 4" style="width: 350px;"/> </td>
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset0_0.5.png?raw=true" alt="Width Offset 0, Height Offset 0.5" style="width: 350px;"/> </td>
@@ -86,7 +86,7 @@ These control how offset the cross section is from the center of the curve. When
 __Length Step Size/Width Step Size:__  
 These control the dimensions of the faces that the curve will be subdivided into. The smaller the size the smoother the geometry will be but the curve will take up more memory and take longer to make. Using larger face sizes can create a jagged edge on the curve.
 
-<table border="0"><tr>
+<table><tr>
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step0.5.png?raw=true" alt="Length Step 0.5" style="width: 350px;"/> </td>
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step1.png?raw=true" alt="Length Step 1" style="width: 350px;"/> </td>
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step4.png?raw=true" alt="Length Step 4" style="width: 350px;"/> </td>
@@ -100,7 +100,7 @@ These control the dimensions of the faces that the curve will be subdivided into
 __Round Tile to Nearest:__  
 This controls how the faces that make up the curve and the uvs are rounded to better fit the curve. For example if there is a curve of length 21.4 when __Round Tile to Nearest__ is set to 0 no rounding will occur so the curve will have 21 tiles plus a last tile of length 0.4 the rest of the tiles. If __Round Tile to Nearest__ is set to 1 then the curve will be rounded to length 21 so it will have 21 tiles. If __Round Tile to Nearest__ is set to 4 then the curve will be rounded to length 20 and have 20 tiles.
 
-<table border="0"><tr>
+<table><tr>
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/round0.png?raw=true" alt="Round 0" style="width: 350px;"/> </td>
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/round1.png?raw=true" alt="Round 1" style="width: 350px;"/> </td>
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/round4.png?raw=true" alt="Round 4" style="width: 350px;"/> </td>
@@ -120,7 +120,7 @@ __<ins>Parameters</ins>__
 __Inner Radius/Outer Radius:__  
 These determine the size and thickness of the circle cross section of the curve. __Inner Radius__ is the distance from the center to the inner edge and __Outer Radius__ is the distance to the outside edge. So the thickness of the circle will be __Outer Radius__ - __Inner Radius__.
 
-<table border="0"><tr>
+<table><tr>
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/inner4outer5.png?raw=true" alt="Inner 4, Outer 5" style="width: 350px;"/> </td>
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/inner1outer3.png?raw=true" alt="Inner 1, Outer 3" style="width: 350px;"/> </td>
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/inner2outer2.5.png?raw=true" alt="Inner 2, Outer 2.5" style="width: 350px;"/> </td>
@@ -133,6 +133,34 @@ These determine the size and thickness of the circle cross section of the curve.
 
 __Width Offset/Height Offset__:
 These control how offset the cross section is from the center of the curve. When set to 0 and 0 the center of the curve is positioned in the middle of the circle cross section.
+
+<table><tr>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_t2_0.png?raw=true" alt="Width Offset 2, Height Offset 0" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_t-4_4.png?raw=true" alt="Width Offset -4, Height Offset 4" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_t0_3.png?raw=true" alt="Width Offset 0, Height Offset 3" style="width: 350px;"/> </td>
+</tr>
+<tr>
+  <td>Width Offset is 2 and Height Offset is 0</td>
+  <td>Width Offset is -4 and Height Offset is 4</td>
+  <td>Width Offset is 0 and Height Offset is 3</td>
+</tr></table>
+
+__Length Step Size:__  
+This controls the length the faces that the curve will be subdivided into. The smaller the size the length smoother the geometry will be but the curve will take up more memory and take longer to make. Using larger face sizes can create a jagged edge on the curve.
+
+<table><tr>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step0.5.png?raw=true" alt="Length Step 0.5" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step1.png?raw=true" alt="Length Step 1" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step4.png?raw=true" alt="Length Step 4" style="width: 350px;"/> </td>
+</tr>
+<tr>
+  <td>Length Step Size is 0.5</td>
+  <td>Length Step Size is 1</td>
+  <td>Length Step Size is 4</td>
+</tr></table>
+
+__Divisions:__  
+This controls the numbers of faces the circumference of the circle will be made up of. More divisions wil make the curve smoother but take up more memory and take loger to make.
 
 ### Shape
 __rectange__: The cross section of the curve will be a rectangle.    
