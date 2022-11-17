@@ -74,13 +74,13 @@ These control how offset the cross section is from the center of the curve. When
 
 <table border="0"><tr>
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset2_0.png?raw=true" alt="Width Offset 2, Height Offset 0" style="width: 350px;"/> </td>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset-4_4.png?raw=true" alt="Width Offset 2, Height Offset 0" style="width: 350px;"/> </td>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset2_0.png?raw=true" alt="Width Offset 2, Height Offset 0" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset-4_4.png?raw=true" alt="Width Offset -4, Height Offset 4" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset0_0.5.png?raw=true" alt="Width Offset 0, Height Offset 0.5" style="width: 350px;"/> </td>
 </tr>
 <tr>
-  <td>Width is 8 and Height is 1</td>
-  <td>Width is 4 and Height is 4</td>
-  <td>Width is 1 and Height is 2</td>
+  <td>Width Offset is 2 and Height Offset is 0</td>
+  <td>Width Offset is -4 and Height Offset is 4</td>
+  <td>Width Offset is 0 and Height Offset is 0.5</td>
 </tr></table>
 
 ### Shape
