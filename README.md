@@ -8,6 +8,8 @@ The Marble Curves Window appears in the Tool tab in Unity.
 
 Nodes are the basic tool used to create the shape for curves. The button __Create New Nodes__ creates a Nodes object in the heirarchy with a number of node object children specified by __Number of Nodes__. They will spawn in front of the camera in the scene. Wherever the nodes are positioned within the scene the curve will go through them. The curve will also be going in the drection of the node at that point and it's rotation will be determined by the rotation of the node. This means that all kinds of shaped curves can be made by positioning the nodes in different ways. 
 
+![Nodes](https://github.com/J2-2/MarbleCurves/blob/main/UserManuelResources/Nodes.png?raw=true)
+
 Make a new set of nodes with the number to create specified by __Number of Nodes__.
 
 ### Load Selected Nodes
