@@ -26,18 +26,20 @@ Add a node to the currently selected set of nodes at the position specified by _
 
 ### Node Smoothness Values
 
-Node smoothness value is a property of each node that determines how straight the curve will be at that node. The higher the smoothness value the straighter the curve. Here is an example of 3 curves with nodes in the same postion but with different Smoothness Values.
+Node smoothness value is a property of each node that determines how straight the curve will be at that node. The higher the smoothness value the straighter the curve. Here is an example of 3 curves with nodes in the same postion but with different smoothness values.
 
 <table border="0"><tr>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/Nodes.png?raw=true" alt="Smoothness 20" style="width: 350px;"/> </td>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/Nodes.png?raw=true" alt="Smoothness 30" style="width: 350px;"/> </td>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/Nodes.png?raw=true" alt="Smoothness 50" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/Smoothness20.png?raw=true" alt="Smoothness 20" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/Smoothness30.png?raw=true" alt="Smoothness 30" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/Smoothness50.png?raw=true" alt="Smoothness 50" style="width: 350px;"/> </td>
 </tr>
 <tr>
   <td>Node smoothness is 20 for all nodes</td>
   <td>Node smoothness is 30 for all nodes</td>
   <td>Node smoothness is 50 for all nodes</td>
 </tr></table>
+
+The nodes do not have to have the same smoothness value, they can be changed individually to achive a desired curve shape. If just a smooth curve is desired then the __Auto-Position Internal Nodes__ button will change the orientation and node smoothness of each node except for the ones on the end to make it as smooth as possible. This means to make a smooth curve all that needs to be done is to put nodes in the desired postion, orient the first and last nodes and choose desired node smoothness and then __Auto-Position Internal Nodes__ will do the rest.
 
 ### Rectangle Mode
 
