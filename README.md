@@ -2,7 +2,7 @@
 
 The Marble Curves Window appears in the Tool tab in Unity.
 
-## User Manuel
+## User Manual
 
 ### Nodes
 
