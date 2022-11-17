@@ -12,6 +12,7 @@ To install Marble Curves, on github go to Code>Download Zip to download a zip fi
 [Nodes](#nodes)  
 [Rectangle Mode](#rectangle_mode)  
 [Tube Mode](#tube_mode)  
+[Custom Mode](#custom_mode)  
 
 <a name="nodes"></a>
 ### Nodes
@@ -190,15 +191,27 @@ __Round Tile to Nearest:__
 This controls how the faces that make up the curve and the uvs are rounded to better fit the curve. For example if there is a curve of length 21.4 when __Round Tile to Nearest__ is set to 0 no rounding will occur so the curve will have 21 tiles plus a last tile of length 0.4 the rest of the tiles. If __Round Tile to Nearest__ is set to 1 then the curve will be rounded to length 21 so it will have 21 tiles. If __Round Tile to Nearest__ is set to 4 then the curve will be rounded to length 20 and have 20 tiles.
 
 <table><tr>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/round0.png?raw=true" alt="Round 0" style="width: 350px;"/> </td>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/round1.png?raw=true" alt="Round 1" style="width: 350px;"/> </td>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/round4.png?raw=true" alt="Round 4" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/round_t0.png?raw=true" alt="Round 0" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/round_t1.png?raw=true" alt="Round 1" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/round_t4.png?raw=true" alt="Round 4" style="width: 350px;"/> </td>
 </tr>
 <tr>
   <td>Round Tile to Nearest is 0</td>
   <td>Round Tile to Nearest is 1</td>
   <td>Round Tile to Nearest is 4</td>
 </tr></table>
+
+<a name="custom_mode"></a>
+### Custom Mode
+
+Custom mode can be selected by choosing the __custom__ option in the mode selector. This mode makes it so that the cross section of the curve will be the shape of the chosen __Cross Section__. The middle of the curve will be centered on the pivot of the __Cross Section__ object.
+
+__<ins>Parameters</ins>__
+
+__Cross Section:__
+This is a GameObject that determines the shape of the cross section of the curve. A GameObject can be chosen by dragging it into the __Cross Section__ box in the Marble Curves window or by selecting it and pressing the __Use Selected Button__. The selected GameObject must have a 3D mesh to be used. The edges of the faces of object along x = 0 relative to the pivot will be used so make sure that the pivot is in the right location of the object selected. Faces entirely within x = 0 will be used at the start and the end of the curve. UV information from the GameObject will be used. Some examples of diefferent __Cross Section__ gameobjects with pivots visualized and the curves they generate are below.
+
+
 
 ### Shape
 __rectange__: The cross section of the curve will be a rectangle.    
@@ -212,7 +225,7 @@ The width and height that the rectangle cross section of the curve will have whe
 ### Inner Radius/Outer Radius
 The distance to the inside edge and outside edge of the circle cross section the curve will have when in __tube__ mode.
 
-### Width Offset/Height Offset
+### Width Offset/Height Offset  
 The distance away from the middle of the curve that the cross section will be centered on.
 
 ### Length Step Size/Width Step Size
