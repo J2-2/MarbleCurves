@@ -41,9 +41,23 @@ Node smoothness value is a property of each node that determines how straight th
 
 The nodes do not have to have the same smoothness value, they can be changed individually to achive a desired curve shape. If just a smooth curve is desired then the __Auto-Position Internal Nodes__ button will change the orientation and node smoothness of each node except for the ones on the end to make it as smooth as possible. This means to make a smooth curve all that needs to be done is to put nodes in the desired postion, orient the first and last nodes and choose desired node smoothness and then __Auto-Position Internal Nodes__ will do the rest.
 
+__<ins>Buttons</ins>__
+
+__Set All:__  
+Sets the value of each node's node smoothness to the value specified by __Smoothness Value__.
+
+__Auto-Position Internal Nodes:__  
+Sets the orientation and node smoothness of each node except for the first and last one based on their positions and the direction and node smoothess of the first and lasts nodes in a way as to make the curve as smooth as possible.
+
 ### Rectangle Mode
 
-Ractangle mode can be selected by choosing the __rectangle__ option in the mode selector. This mode make it so that the cross section of the curve will be a rectangle with dimensions specified by __width__ and __height__
+Ractangle mode can be selected by choosing the __rectangle__ option in the mode selector. This mode make it so that the cross section of the curve will be a rectangle with dimensions specified by __width__ and __height__.
+
+__<ins>Parameters</ins>__
+
+__Width/Height:__  
+These control the width and height of the cross section of the curve.
+
 
 
 ### Shape
