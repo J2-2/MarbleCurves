@@ -51,14 +51,23 @@ Sets the orientation and node smoothness of each node except for the first and l
 
 ### Rectangle Mode
 
-Ractangle mode can be selected by choosing the __rectangle__ option in the mode selector. This mode make it so that the cross section of the curve will be a rectangle with dimensions specified by __width__ and __height__.
+Ractangle mode can be selected by choosing the __rectangle__ option in the mode selector. This mode make it so that the cross section of the curve will be a rectangle with dimensions specified by __width__ and __height__. The middle of the curve will be centered on the top edge of the rectangle.
 
-__<ins>Parameters</ins>__
+__<ins>Parameters</ins>_
 
 __Width/Height:__  
 These control the width and height of the cross section of the curve.
 
-
+<table border="0"><tr>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/width8height1.png?raw=true" alt="Width 8, Height 1" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/width4height4.png?raw=true" alt="Width 4, Height 4" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/width1height2.png?raw=true" alt="Width 1, Height 2" style="width: 350px;"/> </td>
+</tr>
+<tr>
+  <td>Width is 8 and Height is 1</td>
+  <td>Width is 4 and Height is 4</td>
+  <td>Width is 1 and Height is 2</td>
+</tr></table>
 
 ### Shape
 __rectange__: The cross section of the curve will be a rectangle.    
