@@ -1,9 +1,20 @@
 # Marble Curves
 
-The Marble Curves Window appears in the Tool tab in Unity.
+Marble Curves is a Unity package that provides a node based system for creating 3D curves. 
+
+## Installation
+To install Marble Curves, on github go to Code>Download Zip
+To The Marble Curves Window appears in the Tool tab in Unity.
 
 ## User Manual
 
+### Table of Contents
+
+[Nodes](#nodes)  
+[Rectangle Mode](#rectangle_mode)  
+[Tube Mode](#tube_mode)  
+
+<a name="nodes"></a>
 ### Nodes
 
 Nodes are the basic tool used to create the shape for curves. The button __Create New Nodes__ creates a Nodes object in the heirarchy with a number of node object children specified by __Number of Nodes__. They will spawn in front of the camera in the scene. Wherever the nodes are positioned within the scene the curve will go through them. The curve will also be going in the drection of the node at that point and it's rotation will be determined by the rotation of the node. This means that all kinds of shaped curves can be made by positioning the nodes in different ways. 
@@ -49,6 +60,7 @@ Sets the value of each node's node smoothness to the value specified by __Smooth
 __Auto-Position Internal Nodes:__  
 Sets the orientation and node smoothness of each node except for the first and last one based on their positions and the direction and node smoothess of the first and lasts nodes in a way as to make the curve as smooth as possible.
 
+<a name="rectangle_mode"></a>
 ### Rectangle Mode
 
 Ractangle mode can be selected by choosing the __rectangle__ option in the mode selector. This mode makes it so that the cross section of the curve will be a rectangle with dimensions specified by __Width__ and __Height__. The middle of the curve will be centered on the top edge of the rectangle.
@@ -111,6 +123,7 @@ This controls how the faces that make up the curve and the uvs are rounded to be
   <td>Round Tile to Nearest is 4</td>
 </tr></table>
 
+<a name="tube_mode"></a>
 ### Tube Mode
 
 Ractangle mode can be selected by choosing the __tube__ option in the mode selector. This mode makes it so that the cross section of the curve will be a circle with an inner and outer edge specified by __Inner Radius__ and __Outer Randius__. The middle of the curve will be centered on the middle of the circle.
@@ -161,6 +174,17 @@ This controls the length the faces that the curve will be subdivided into. The s
 
 __Divisions:__  
 This controls the numbers of faces the circumference of the circle will be made up of. More divisions wil make the curve smoother but take up more memory and take loger to make.
+
+<table><tr>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/divisions32.png?raw=true" alt="Divisions 32" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/divisions16.png?raw=true" alt="Divisions 16" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/divisions8.png?raw=true" alt="Divisions 8" style="width: 350px;"/> </td>
+</tr>
+<tr>
+  <td>32 Divisions</td>
+  <td>16 Divisions</td>
+  <td>8 Divisions</td>
+</tr></table>
 
 ### Shape
 __rectange__: The cross section of the curve will be a rectangle.    
