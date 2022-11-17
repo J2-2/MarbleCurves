@@ -10,16 +10,28 @@ Nodes are the basic tool used to create the shape for curves. The button __Creat
 
 ![Nodes](https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/Nodes.png?raw=true)
 
+__<ins>Buttons</ins>__
+
+__Create New Nodes:__  
 Make a new set of nodes with the number to create specified by __Number of Nodes__.
 
-### Load Selected Nodes
-Load the set of nodes that is selected in the heirarchy.
+__Load Selected Nodes:__  
+Load the set of nodes that is selected in the heirarchy. You can have either the nodes parent object selected or any of the node objects selected.
 
-### Delete Node
+__Delete Node:__  
 Delete the node from the currently selected set of nodes at the position specified by __Position__.
 
-### Add Node
+__Add Node:__  
 Add a node to the currently selected set of nodes at the position specified by __Position__.
+
+### Node Smoothness Values
+
+Node smoothness value is a property of each node that determines how straight the curve will be at that node. The higher the smoothness value the straighter the curve. Here is an example of 3 curves with nodes in the same postion but with different Smoothness Values.
+
+### Rectangle Mode
+
+Ractangle mode can be selected by choosing the __rectangle__ option in the mode selector. This mode make it so that the cross section of the curve will be a rectangle with dimensions specified by __width__ and __height__
+
 
 ### Shape
 __rectange__: The cross section of the curve will be a rectangle.    
