@@ -69,6 +69,20 @@ These control the width and height of the cross section of the curve.
   <td>Width is 1 and Height is 2</td>
 </tr></table>
 
+__Width Offset/Height Offset__:
+These control how offset the cross section is from the center of the curve. When set to 0 and 0 the center of the curve is positioned in the middle of the top edge of the rectangle cross section. 
+
+<table border="0"><tr>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset2_0.png?raw=true" alt="Width Offset 2, Height Offset 0" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset-4_4.png?raw=true" alt="Width Offset 2, Height Offset 0" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset2_0.png?raw=true" alt="Width Offset 2, Height Offset 0" style="width: 350px;"/> </td>
+</tr>
+<tr>
+  <td>Width is 8 and Height is 1</td>
+  <td>Width is 4 and Height is 4</td>
+  <td>Width is 1 and Height is 2</td>
+</tr></table>
+
 ### Shape
 __rectange__: The cross section of the curve will be a rectangle.    
 __tube__: The cross section of the curve will be a circle.    
