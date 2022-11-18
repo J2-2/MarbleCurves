@@ -209,7 +209,7 @@ Custom mode can be selected by choosing the __custom__ option in the mode select
 __<ins>Parameters</ins>__
 
 __Cross Section:__
-This is a GameObject that determines the shape of the cross section of the curve. A GameObject can be chosen by dragging it into the __Cross Section__ box in the Marble Curves window or by selecting it and pressing the __Use Selected Button__. The selected GameObject must have a 3D mesh to be used. The edges of the faces of object along x = 0 relative to the pivot will be used so make sure that the pivot is in the right location of the object selected. Faces entirely within x = 0 will be used at the start and the end of the curve. UV information from the GameObject will be used. Some examples of diefferent __Cross Section__ gameobjects with pivots visualized and the curves they generate are below.
+This is a GameObject that determines the shape of the cross section of the curve. A GameObject can be chosen by dragging it into the __Cross Section__ box in the Marble Curves window or by selecting it and pressing the __Use Selected Button__. The selected GameObject must have a 3D mesh to be used. The edges of the faces of object along x = 0 relative to the pivot will be used so make sure that the pivot is in the right location of the object selected. Faces entirely within x = 0 will be used at the start and the end of the curve. UV information from the GameObject will be used, If the UVs on one side are messed up (the face will apear black with the default texture) then make sure the UVs on that face of the the __Cross Section__ GameObject are not rotated. Some examples of diefferent __Cross Section__ gameobjects with pivots visualized and the curves they generate are below.
 
 
 
