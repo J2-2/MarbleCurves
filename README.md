@@ -216,7 +216,7 @@ This is a GameObject that determines the shape of the cross section of the curve
 
 <table><tr>
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/custom1.png?raw=true" alt="Custom Cross Section #1" style="width: 350px;"/> </td>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/custom2.png?raw=true" alt="Custom Cross Section #2" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/custom2_.png?raw=true" alt="Custom Cross Section #2" style="width: 350px;"/> </td>
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/custom3.png?raw=true" alt="Custom Cross Section #3" style="width: 350px;"/> </td>
 </tr></table>
 
@@ -224,9 +224,9 @@ __Width Offset/Height Offset__:
 These control how offset the cross section is from the center of the curve. When set to 0 and 0 the center of the curve is positioned on the pivot of the selected __Cross Section__ GameObject.
 
 <table><tr>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_c6_0.png?raw=true" alt="Width Offset 6, Height Offset 0" style="width: 350px;"/> </td>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_c-4_4.png?raw=true" alt="Width Offset -4, Height Offset 4" style="width: 350px;"/> </td>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_c0_-1.png?raw=true" alt="Width Offset 0, Height Offset -1" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_c6_0_.png?raw=true" alt="Width Offset 6, Height Offset 0" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_c-4_4_.png?raw=true" alt="Width Offset -4, Height Offset 4" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_c0_-1_.png?raw=true" alt="Width Offset 0, Height Offset -1" style="width: 350px;"/> </td>
 </tr>
 <tr>
   <td>Width Offset is 6 and Height Offset is 0</td>
@@ -238,9 +238,9 @@ __Length Step Size:__
 This controls the length the faces that the curve will be subdivided into. The smaller the size of the length step the smoother the geometry will be but the curve will take up more memory and take longer to make. Using larger face sizes can create a jagged edge on the curve.
 
 <table><tr>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step_t0.5.png?raw=true" alt="Length Step 0.5" style="width: 350px;"/> </td>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step_t1.png?raw=true" alt="Length Step 1" style="width: 350px;"/> </td>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step_t4.png?raw=true" alt="Length Step 4" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step_c0.5.png?raw=true" alt="Length Step 0.5" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step_c1.png?raw=true" alt="Length Step 1" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step_c4.png?raw=true" alt="Length Step 4" style="width: 350px;"/> </td>
 </tr>
 <tr>
   <td>Length Step Size is 0.5</td>
