@@ -1,6 +1,6 @@
 # Marble Curves
 
-Marble Curves is a Unity package that provides a node based system for creating 3D curves. 
+Marble Curves is a Unity package that provides a node based system for creating 3D curves. Included in this document are installation instructions, links to some video tutorials and a user manual.
 
 ## Installation
 To install Marble Curves, on github go to Code>Download Zip to download a zip file containing the unity package then extract the contents. Then in Unity go to Assets>Import Package>Custom package then selected the .unitypackage file in the newly extracted files. Now an option for the Marble Curves Window should appear in the Tool tab in Unity.
@@ -13,6 +13,9 @@ To install Marble Curves, on github go to Code>Download Zip to download a zip fi
 [Rectangle Mode](#rectangle_mode)  
 [Tube Mode](#tube_mode)  
 [Custom Mode](#custom_mode)  
+[Fit to Curve Mode](#fit_to_curve_mode)
+[UVs](#uvs)
+[Curve Options](#curve_options)
 
 <a name="nodes"></a>
 ### Nodes
@@ -144,7 +147,7 @@ These determine the size and thickness of the circle cross section of the curve.
   <td>Inner Radius is 2 and Outer Radius is 2.5</td>
 </tr></table>
 
-__Width Offset/Height Offset__:
+__Width Offset/Height Offset__:  
 These control how offset the cross section is from the center of the curve. When set to 0 and 0 the center of the curve is positioned in the middle of the circle cross section.
 
 <table><tr>
@@ -159,7 +162,7 @@ These control how offset the cross section is from the center of the curve. When
 </tr></table>
 
 __Length Step Size:__  
-This controls the length the faces that the curve will be subdivided into. The smaller the size the length smoother the geometry will be but the curve will take up more memory and take longer to make. Using larger face sizes can create a jagged edge on the curve.
+This controls the length the faces that the curve will be subdivided into. The smaller the size of the length step the smoother the geometry will be but the curve will take up more memory and take longer to make. Using larger face sizes can create a jagged edge on the curve.
 
 <table><tr>
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step_t0.5.png?raw=true" alt="Length Step 0.5" style="width: 350px;"/> </td>
@@ -217,18 +220,32 @@ This is a GameObject that determines the shape of the cross section of the curve
   <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/custom3.png?raw=true" alt="Custom Cross Section #3" style="width: 350px;"/> </td>
 </tr></table>
 
-__Width Offset/Height Offset__:
+__Width Offset/Height Offset__:  
 These control how offset the cross section is from the center of the curve. When set to 0 and 0 the center of the curve is positioned on the pivot of the selected __Cross Section__ GameObject.
 
 <table><tr>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_t2_0.png?raw=true" alt="Width Offset 2, Height Offset 0" style="width: 350px;"/> </td>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_t-4_4.png?raw=true" alt="Width Offset -4, Height Offset 4" style="width: 350px;"/> </td>
-  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_t0_3.png?raw=true" alt="Width Offset 0, Height Offset 3" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_c6_0.png?raw=true" alt="Width Offset 6, Height Offset 0" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_c-4_4.png?raw=true" alt="Width Offset -4, Height Offset 4" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_c0_-1.png?raw=true" alt="Width Offset 0, Height Offset -1" style="width: 350px;"/> </td>
 </tr>
 <tr>
-  <td>Width Offset is 2 and Height Offset is 0</td>
+  <td>Width Offset is 6 and Height Offset is 0</td>
   <td>Width Offset is -4 and Height Offset is 4</td>
-  <td>Width Offset is 0 and Height Offset is 3</td>
+  <td>Width Offset is 0 and Height Offset is -1</td>
+</tr></table>
+
+__Length Step Size:__  
+This controls the length the faces that the curve will be subdivided into. The smaller the size of the length step the smoother the geometry will be but the curve will take up more memory and take longer to make. Using larger face sizes can create a jagged edge on the curve.
+
+<table><tr>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step_t0.5.png?raw=true" alt="Length Step 0.5" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step_t1.png?raw=true" alt="Length Step 1" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/step_t4.png?raw=true" alt="Length Step 4" style="width: 350px;"/> </td>
+</tr>
+<tr>
+  <td>Length Step Size is 0.5</td>
+  <td>Length Step Size is 1</td>
+  <td>Length Step Size is 4</td>
 </tr></table>
 
 ### Shape
