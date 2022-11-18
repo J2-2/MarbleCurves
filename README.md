@@ -208,10 +208,28 @@ Custom mode can be selected by choosing the __custom__ option in the mode select
 
 __<ins>Parameters</ins>__
 
-__Cross Section:__
+__Cross Section:__  
 This is a GameObject that determines the shape of the cross section of the curve. A GameObject can be chosen by dragging it into the __Cross Section__ box in the Marble Curves window or by selecting it and pressing the __Use Selected Button__. The selected GameObject must have a 3D mesh to be used. The edges of the faces of object along x = 0 relative to the pivot will be used so make sure that the pivot is in the right location of the object selected. Faces entirely within x = 0 will be used at the start and the end of the curve. UV information from the GameObject will be used, If the UVs on one side are messed up (the face will apear black with the default texture) then make sure the UVs on that face of the the __Cross Section__ GameObject are not rotated. Some examples of diefferent __Cross Section__ gameobjects with pivots visualized and the curves they generate are below.
 
+<table><tr>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/custom1.png?raw=true" alt="Custom Cross Section #1" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/custom2.png?raw=true" alt="Custom Cross Section #2" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/custom3.png?raw=true" alt="Custom Cross Section #3" style="width: 350px;"/> </td>
+</tr></table>
 
+__Width Offset/Height Offset__:
+These control how offset the cross section is from the center of the curve. When set to 0 and 0 the center of the curve is positioned on the pivot of the selected __Cross Section__ GameObject.
+
+<table><tr>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_t2_0.png?raw=true" alt="Width Offset 2, Height Offset 0" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_t-4_4.png?raw=true" alt="Width Offset -4, Height Offset 4" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_t0_3.png?raw=true" alt="Width Offset 0, Height Offset 3" style="width: 350px;"/> </td>
+</tr>
+<tr>
+  <td>Width Offset is 2 and Height Offset is 0</td>
+  <td>Width Offset is -4 and Height Offset is 4</td>
+  <td>Width Offset is 0 and Height Offset is 3</td>
+</tr></table>
 
 ### Shape
 __rectange__: The cross section of the curve will be a rectangle.    
