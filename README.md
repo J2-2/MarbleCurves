@@ -262,6 +262,13 @@ This controls how the faces that make up the curve and the uvs are rounded to be
   <td>Round Tile to Nearest is 4</td>
 </tr></table>
 
+<a name="fit_to_curve_mode"></a>
+### Fit to Curve Mode
+
+Custom mode can be selected by choosing the __fit to curve__ option in the mode selector. This mode makes it so that the curve will be a copy of shape of the chosen __Object to Fit__ That is deformed so that it fits along the curve. The middle of the curve will be centered on the pivot of the __Object to Fit__ object.
+
+__<ins>Parameters</ins>__
+
 ### Shape
 __rectange__: The cross section of the curve will be a rectangle.    
 __tube__: The cross section of the curve will be a circle.    
