@@ -248,6 +248,20 @@ This controls the length the faces that the curve will be subdivided into. The s
   <td>Length Step Size is 4</td>
 </tr></table>
 
+__Round Tile to Nearest:__  
+This controls how the faces that make up the curve and the uvs are rounded to better fit the curve. For example if there is a curve of length 21.4 when __Round Tile to Nearest__ is set to 0 no rounding will occur so the curve will have 21 tiles plus a last tile of length 0.4 the rest of the tiles. If __Round Tile to Nearest__ is set to 1 then the curve will be rounded to length 21 so it will have 21 tiles. If __Round Tile to Nearest__ is set to 4 then the curve will be rounded to length 20 and have 20 tiles.
+
+<table><tr>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/round_c0.png?raw=true" alt="Round 0" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/round_c1.png?raw=true" alt="Round 1" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/round_c4.png?raw=true" alt="Round 4" style="width: 350px;"/> </td>
+</tr>
+<tr>
+  <td>Round Tile to Nearest is 0</td>
+  <td>Round Tile to Nearest is 1</td>
+  <td>Round Tile to Nearest is 4</td>
+</tr></table>
+
 ### Shape
 __rectange__: The cross section of the curve will be a rectangle.    
 __tube__: The cross section of the curve will be a circle.    
