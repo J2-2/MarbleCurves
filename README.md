@@ -269,6 +269,59 @@ Custom mode can be selected by choosing the __fit to curve__ option in the mode 
 
 __<ins>Parameters</ins>__
 
+__Object to Fit:__  
+This is a GameObject that will be copied and deformed so that it fits along the curve. A GameObject can be chosen by dragging it into the __Object to Fit__ box in the Marble Curves window or by selecting it and pressing the __Use Selected Button__. The length along the x-axis will be the length along the curve. The object begin at x = 0 realtive to it's pivot and should be shorter than the length of the curve. If the object is longer than the length of the curve the __Stretch to Fit Curve__ option can be selected so that it will be compressed to fit in the curves length. Below is an object with pivot visaulized and the result of fitting it to a curve.
+
+![Fit Curve](https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/fitcurve.png?raw=true)
+
+__Offset:__  
+This controls how many units away from the start of the curve the object will be fit too. When Offset is 0 the pivot of the object will be at the start of the curve.
+
+<table><tr>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_f0.png?raw=true" alt="Offset 0" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_f5.png?raw=true" alt="Offset 5" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_f10.png?raw=true" alt="Offset 10" style="width: 350px;"/> </td>
+</tr>
+<tr>
+  <td>Offset is 0</td>
+  <td>Offset is 5</td>
+  <td>Offset is 10</td>
+</tr></table>
+
+__Width Offset/Height Offset__:  
+These control how offset the cross section is from the center of the curve. When set to 0 and 0 the center of the curve is positioned on the pivot of the selected __Object to Fit__ GameObject.
+
+<table><tr>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_f4_0.png?raw=true" alt="Width Offset 4, Height Offset 0" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_f-4_4.png?raw=true" alt="Width Offset -4, Height Offset 4" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_f0_1.png?raw=true" alt="Width Offset 0, Height Offset 1" style="width: 350px;"/> </td>
+</tr>
+<tr>
+  <td>Width Offset is 4 and Height Offset is 0</td>
+  <td>Width Offset is -4 and Height Offset is 4</td>
+  <td>Width Offset is 0 and Height Offset is 1</td>
+</tr></table>
+
+__Stretch to Fit Curve:__  
+This option wether the length of the object is stretched or compressed so that it is the same length of the curve or wether it keeps its original length.
+
+<table><tr>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/offset_f0.png?raw=true" alt="Stretch to Fit Curve Off" style="width: 525px;"/></td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/stretch.png?raw=true" alt="Stretch to Fit Curve On" style="width: 525px;"/></td>
+</tr>
+<tr>
+  <td>Stretch to Fit Curve Off</td>
+  <td>Stretch to Fit Curve On</td>
+</tr></table>
+
+
+<a name="uvs"></a>
+### UVs
+
+There are options for setting how the UVs for the curve should look. Different Modes have different numbers of options for UVs because some modes take UVs from an input object also.
+
+__<ins>Parameters</ins>__
+
 ### Shape
 __rectange__: The cross section of the curve will be a rectangle.    
 __tube__: The cross section of the curve will be a circle.    
