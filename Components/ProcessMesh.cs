@@ -32,7 +32,7 @@ public class ProcessMesh
 		return uniqueList;
 	}
 	
-	public static (List<(int, int)>, List<List<int>>) GetPairsAndFaces(Mesh mesh) {
+	private static (List<(int, int)>, List<List<int>>) GetPairsAndFaces(Mesh mesh) {
 		List<(int, int)> pairs = new List<(int, int)>();
 		List<List<int>> faces = new List<List<int>>();
 		
@@ -64,6 +64,22 @@ public class ProcessMesh
 		return (pairs, faces);
 	}
 	
+	private static int GetFirst(Mesh mesh, List<(int, int)> pairs) {
+		int first;
+		for (int i = 0; i < pairs.Count; i++) {
+			first = pairs[i].Item1;
+			bool found = false;
+			for (int j = 0; j < pairs.Count; j++) {
+				if (mesh.vertices[pairs[j].Item2] == mesh.vertices[first]) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) return first;
+		}
+		return pairs[0].Item1;
+	}
+	
     public static (Vector2[], List<(float, float)>, List<(Vector2, Vector2)>, (Vector3[], Vector2[], int[])) GetPointsUVsAndCap(Mesh mesh) {
 		List<Vector2> points = new List<Vector2>();
 		List<(float, float)> UVs = new List<(float, float)>();
@@ -80,14 +96,11 @@ public class ProcessMesh
 			return (null, null, null, (null, null, null));
 		}
 		
-		//for (int j = 0; j < pairs.Count; j++) {
-		//	Debug.Log("Pair #" + j.ToString() + ": (" + mesh.vertices[pairs[j].Item1].ToString() + ", " + mesh.vertices[pairs[j].Item2].ToString() + ") | Norms: (" 
-		//+ mesh.normals[pairs[j].Item1].ToString() + ", " + mesh.normals[pairs[j].Item2].ToString() + ")");
-		//}
-		
-		points.Add(new Vector2(mesh.vertices[pairs[0].Item1].z, mesh.vertices[pairs[0].Item1].y));
-		UVs.Add((0, mesh.uv[pairs[0].Item1].y));
-		normals.Add((new Vector2(0, 0), new Vector2(mesh.normals[pairs[0].Item1].z, mesh.normals[pairs[0].Item1].y)));
+
+		int first = GetFirst(mesh, pairs);
+		points.Add(new Vector2(mesh.vertices[first].z, mesh.vertices[first].y));
+		UVs.Add((0, mesh.uv[first].y));
+		normals.Add((new Vector2(0, 0), new Vector2(mesh.normals[first].z, mesh.normals[first].y)));
 		//UVs.Add((mesh.uv[pairs[0].Item2].y, 0));
 		bool done = false;
 		int i = 0;
@@ -98,16 +111,13 @@ public class ProcessMesh
 				done = true;
 			} else {
 				Vector2 newPoint = new Vector2(mesh.vertices[pairs[i].Item1].z, mesh.vertices[pairs[i].Item1].y);
-				//Debug.Log("New Point f: " + newPoint.ToString());
 				if (points[points.Count-1] == newPoint) {
-					//Debug.Log("Match Found");
 					newPoint = new Vector2(mesh.vertices[pairs[i].Item2].z, mesh.vertices[pairs[i].Item2].y);
 					UVs[UVs.Count-1] = (UVs[UVs.Count-1].Item1, mesh.uv[pairs[i].Item1].y);
 					UVs.Add((mesh.uv[pairs[i].Item2].y, 0));
 					normals[normals.Count-1] = (normals[normals.Count-1].Item1, new Vector2(mesh.normals[pairs[i].Item1].z, mesh.normals[pairs[i].Item1].y));
 					normals.Add((new Vector2(mesh.normals[pairs[i].Item2].z, mesh.normals[pairs[i].Item2].y), new Vector2(0, 0)));
 					pairs.RemoveAt(i);
-					//Debug.Log("Adding: " + newPoint.ToString());
 					points.Add(newPoint);
 					if (newPoint == points[0]) {
 						done = true;
@@ -116,12 +126,9 @@ public class ProcessMesh
 					continue;
 				}
 				newPoint = new Vector2(mesh.vertices[pairs[i].Item2].z, mesh.vertices[pairs[i].Item2].y);
-				//Debug.Log("New Point b: " + newPoint.ToString());
 				if (points[points.Count-1] == newPoint) {
-					//Debug.Log("Match Found");
 					newPoint = new Vector2(mesh.vertices[pairs[i].Item1].z, mesh.vertices[pairs[i].Item1].y);
 					pairs.RemoveAt(i);
-					//Debug.Log("Adding: " + newPoint.ToString());
 					points.Add(newPoint);
 					if (newPoint == points[0]) {
 						done = true;

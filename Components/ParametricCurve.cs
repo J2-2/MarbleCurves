@@ -436,7 +436,7 @@ public class ParametricCurve {
 		for (int i = 0; i < newVertices.Length; i++) {
 			t = XToTMap[mesh.vertices[i].x + fitOffset];
 			//Vector3 offsetY = XToNormalMap[mesh.vertices[i].x + fitOffset].normalized;
-			Vector3 offsetY = interpNormals[(int) Math.Floor(t*100)];
+			Vector3 offsetY = interpNormals[(int) Math.Floor(t*100)].normalized;
 			Vector3 offsetX = Vector3.Cross(direction(t), offsetY).normalized;
 			newVertices[i] = position(t) + (mesh.vertices[i].y + masterHeightOffset)*offsetY + (mesh.vertices[i].z + masterWidthOffset)*offsetX;
 			newUV[i] = mesh.uv[i];
@@ -497,7 +497,7 @@ public class ParametricCurve {
 			Vector3 currPosition = position(t);
 			Vector3 currDirection = direction(t);
 			
-			Vector3 offsetHeight = stepNormals[i];
+			Vector3 offsetHeight = stepNormals[i].normalized;
 			Vector3 offset = Vector3.Cross(currDirection, offsetHeight).normalized;
 			
 			float arcLength = 0;
@@ -638,7 +638,7 @@ public class ParametricCurve {
 			Vector3 currPosition = position(t);
 			Vector3 currDirection = direction(t);
 			
-			Vector3 offsetHeight = stepNormals[i];
+			Vector3 offsetHeight = stepNormals[i].normalized;
 			Vector3 offset = Vector3.Cross(currDirection, offsetHeight).normalized;
 			
 			float arcLength = 0;
@@ -828,7 +828,7 @@ public class ParametricCurve {
 			Vector3 currPosition = position(t);
 			Vector3 currDirection = direction(t);
 			
-			Vector3 offsetY = stepNormals[i];
+			Vector3 offsetY = stepNormals[i].normalized;
 			Vector3 offsetX = Vector3.Cross(currDirection, offsetY).normalized;
 			
 			float arcLength = 0;

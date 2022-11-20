@@ -123,6 +123,14 @@ public class CurveMaker : EditorWindow
 		}
 	}
 	
+	private void CleanNodes() {
+		for (int i = 0; i < nodeParent.transform.childCount; i++) {
+			if (nodeParent.transform.GetChild(i).gameObject.GetComponent<NodeSmoothness>() == null) {
+				nodeParent.transform.GetChild(i).parent = null;
+			}
+		}
+	}
+	
 	// load the currently selected game object into nodeParent and its children into the nodes list
 	private void LoadNodes(GameObject np) {
 		nodeParent = np;
@@ -135,6 +143,9 @@ public class CurveMaker : EditorWindow
 				return;
 			}
 		}
+		
+		CleanNodes();
+		
 		nodes = new List<GameObject>();
 		for (int i = 0; i < nodeParent.transform.childCount; i++) {
 			nodes.Add(nodeParent.transform.GetChild(i).gameObject);
@@ -145,6 +156,7 @@ public class CurveMaker : EditorWindow
 	
 	// delete the node in the nodes list at nodePosition
 	private void DeleteNode() {
+		CleanNodes();
 		if (nodePosition-1 >= nodes.Count || nodePosition-1 < 0) {
 			message = "No node at selected position";
 			return;
@@ -161,6 +173,7 @@ public class CurveMaker : EditorWindow
 	
 	// add a node to the end of the nodes list
 	private void AddNode() {
+		CleanNodes();
 		InsertNode(nodes.Count);
 	}
 	
@@ -252,24 +265,26 @@ public class CurveMaker : EditorWindow
 				message = "No cross section object is selected";
 				return;
 			}
-			Mesh m = ni.customObject.GetComponent<MeshFilter>().sharedMesh;
-			if (m == null) {
+			if (ni.customObject.GetComponent<MeshFilter>() == null) {
 				message = "The selected cross section object has no mesh";
 				return;
 			}
+			Mesh m = ni.customObject.GetComponent<MeshFilter>().sharedMesh;
 			(Vector2[], List<(float, float)>, List<(Vector2, Vector2)>, (Vector3[], Vector2[], int[])) result = ProcessMesh.GetPointsUVsAndCap(m);
 			if (result.Item1 == null) {
 				message = "The selected object has no valid cross section (make sure pivot is in the right place)";
 				return;
 			}
-			//for (int i = 0; i < result.Item1.Length; i++) {
-			//	Debug.Log("point #" + i.ToString() + ": " + result.Item1[i].ToString() + " | Normals: " + result.Item3[i].Item1.ToString() + ",  " + result.Item3[i].Item2.ToString());
-			//}
+
 			curve.SetCustom(result.Item1, result.Item2, result.Item3, result.Item4);
 		}
 		if (ni.shapeMode == 3) {
 			if (ni.customObject == null) {
 				message = "No object to fit is selected";
+				return;
+			}
+			if (ni.customObject.GetComponent<MeshFilter>() == null) {
+				message = "The selected object has no mesh";
 				return;
 			}
 			curve.SetFitObject(ni.customObject, ni.fitOffset, ni.stretchToCurve);
@@ -389,6 +404,40 @@ public class CurveMaker : EditorWindow
 			return;
 		}
 		
+		UnityEditor.EditorGUIUtility.labelWidth = 140;
+		EditorGUILayout.BeginHorizontal();
+		ni.nodeSmoothness = EditorGUILayout.FloatField("Smoothness Value:", ni.nodeSmoothness);
+		if (GUILayout.Button("Set All")) {
+			for (int i = 0; i < nodes.Count; i++) {
+				NodeSmoothness ns = nodes[i].GetComponent<NodeSmoothness>();
+				ns.SetSmoothness(ni.nodeSmoothness);
+			}
+		}
+		EditorGUILayout.EndHorizontal();
+		
+		EditorGUILayout.LabelField("Node Smoothness Values:");
+		UnityEditor.EditorGUIUtility.labelWidth = 15;
+		innerScrollPosition = EditorGUILayout.BeginScrollView(innerScrollPosition, GUILayout.Height(65));
+		EditorGUILayout.BeginHorizontal();
+		for (int i = 0; i < nodes.Count; i++) {
+			if (nodes[i] != null) {
+				NodeSmoothness ns = nodes[i].GetComponent<NodeSmoothness>();
+				ns.SetSmoothness(EditorGUILayout.FloatField((i+1).ToString() + ":", ns.GetSmoothness()));
+				if ((i+1) % 3 == 0) {
+					EditorGUILayout.EndHorizontal();
+					EditorGUILayout.BeginHorizontal();
+				}
+			}
+		}
+		EditorGUILayout.EndHorizontal();
+		EditorGUILayout.EndScrollView();
+		
+		if (GUILayout.Button("Auto-Position Internal Nodes")) {
+			AutoPosition();
+		}
+		
+		EditorGUILayout.Space();
+		
 		EditorGUILayout.BeginHorizontal();
 		UnityEditor.EditorGUIUtility.labelWidth = 1;
 		EditorGUILayout.LabelField("Mode:");
@@ -398,13 +447,29 @@ public class CurveMaker : EditorWindow
 		
 		if (ni.shapeMode == 3) {
 			UnityEditor.EditorGUIUtility.labelWidth = 90;
+			EditorGUILayout.BeginHorizontal();
 			ni.customObject = EditorGUILayout.ObjectField("Object To Fit:", ni.customObject, typeof(GameObject), true) as GameObject;
+			if (GUILayout.Button("Use Selected")) {
+				ni.customObject = Selection.activeGameObject;
+			}
+			EditorGUILayout.EndHorizontal();
 			ni.fitOffset = EditorGUILayout.FloatField("Offset:", ni.fitOffset);
+			UnityEditor.EditorGUIUtility.labelWidth = 140;
+			EditorGUILayout.BeginHorizontal();
+			UnityEditor.EditorGUIUtility.labelWidth = 80;
+			ni.widthOffset = EditorGUILayout.FloatField("Width Offset:", ni.widthOffset);
+			ni.heightOffset = EditorGUILayout.FloatField("Height Offset:", ni.heightOffset);
+			EditorGUILayout.EndHorizontal();
 			UnityEditor.EditorGUIUtility.labelWidth = 140;
 			ni.stretchToCurve = EditorGUILayout.Toggle("Stretch to Fit Curve:", ni.stretchToCurve);
 		} else if (ni.shapeMode == 2) {
 			UnityEditor.EditorGUIUtility.labelWidth = 90;
+			EditorGUILayout.BeginHorizontal();
 			ni.customObject = EditorGUILayout.ObjectField("Cross Section:", ni.customObject, typeof(GameObject), true) as GameObject;
+			if (GUILayout.Button("Use Selected")) {
+				ni.customObject = Selection.activeGameObject;
+			}
+			EditorGUILayout.EndHorizontal();
 			EditorGUILayout.BeginHorizontal();
 			UnityEditor.EditorGUIUtility.labelWidth = 80;
 			ni.widthOffset = EditorGUILayout.FloatField("Width Offset:", ni.widthOffset);
@@ -451,7 +516,7 @@ public class CurveMaker : EditorWindow
 		if (ni.shapeMode != 3) {
 			UnityEditor.EditorGUIUtility.labelWidth = 140;
 			ni.widthStepSize = Math.Max(ni.widthStepSize, 0.01f);
-			ni.roundLength = Math.Abs(EditorGUILayout.IntField("Round Tile to nearest:", ni.roundLength));
+			ni.roundLength = Math.Abs(EditorGUILayout.IntField("Round Tile to Nearest:", ni.roundLength));
 		
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("UVs:");
@@ -468,38 +533,6 @@ public class CurveMaker : EditorWindow
 		}
 		EditorGUILayout.Space();
 		
-		UnityEditor.EditorGUIUtility.labelWidth = 140;
-		EditorGUILayout.BeginHorizontal();
-		ni.nodeSmoothness = EditorGUILayout.FloatField("Smoothness Value:", ni.nodeSmoothness);
-		if (GUILayout.Button("Set All")) {
-			for (int i = 0; i < nodes.Count; i++) {
-				NodeSmoothness ns = nodes[i].GetComponent<NodeSmoothness>();
-				ns.SetSmoothness(ni.nodeSmoothness);
-			}
-		}
-		EditorGUILayout.EndHorizontal();
-		
-		EditorGUILayout.LabelField("Node Smoothness Values:");
-		UnityEditor.EditorGUIUtility.labelWidth = 15;
-		innerScrollPosition = EditorGUILayout.BeginScrollView(innerScrollPosition, GUILayout.Height(65));
-		EditorGUILayout.BeginHorizontal();
-		for (int i = 0; i < nodes.Count; i++) {
-			if (nodes[i] != null) {
-				NodeSmoothness ns = nodes[i].GetComponent<NodeSmoothness>();
-				ns.SetSmoothness(EditorGUILayout.FloatField((i+1).ToString() + ":", ns.GetSmoothness()));
-				if ((i+1) % 3 == 0) {
-					EditorGUILayout.EndHorizontal();
-					EditorGUILayout.BeginHorizontal();
-				}
-			}
-		}
-		EditorGUILayout.EndHorizontal();
-		EditorGUILayout.EndScrollView();
-		
-		if (GUILayout.Button("Auto-Position Internal Nodes")) {
-			AutoPosition();
-		}
-		
 		EditorGUILayout.BeginHorizontal();
 		UnityEditor.EditorGUIUtility.labelWidth = 50;
 		EditorGUILayout.LabelField("Angle Interpolation:");
@@ -511,12 +544,16 @@ public class CurveMaker : EditorWindow
 			EditorGUILayout.LabelField("Include faces:");
 			EditorGUILayout.BeginHorizontal();
 			ni.topFace = EditorGUILayout.Toggle("Top:", ni.topFace);
-			ni.leftFace = EditorGUILayout.Toggle("Left:", ni.leftFace);
+			if (ni.shapeMode == 0) {
+				ni.leftFace = EditorGUILayout.Toggle("Left:", ni.leftFace);
+			}
 			ni.startFace = EditorGUILayout.Toggle("Start:", ni.startFace);
 			EditorGUILayout.EndHorizontal();
 			EditorGUILayout.BeginHorizontal();
 			ni.bottomFace = EditorGUILayout.Toggle("Bottom:", ni.bottomFace);
-			ni.rightFace = EditorGUILayout.Toggle("Right:", ni.rightFace);
+			if (ni.shapeMode == 0) {
+				ni.rightFace = EditorGUILayout.Toggle("Right:", ni.rightFace);
+			}
 			ni.endFace = EditorGUILayout.Toggle("End:", ni.endFace);
 			EditorGUILayout.EndHorizontal();
 		}
