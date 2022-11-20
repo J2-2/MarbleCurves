@@ -5,6 +5,10 @@ Marble Curves is a Unity package that provides a node based system for creating 
 ## Installation
 To install Marble Curves, on github go to Code>Download Zip to download a zip file containing the unity package then extract the contents. Then in Unity go to Assets>Import Package>Custom package then selected the .unitypackage file in the newly extracted files. Now an option for the Marble Curves Window should appear in the Tool tab in Unity.
 
+## Video Tutorials
+
+Coming Soon
+
 ## User Manual
 
 ### Table of Contents
