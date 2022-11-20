@@ -318,12 +318,26 @@ This option wether the length of the object is stretched or compressed so that i
 <a name="uvs"></a>
 ### UVs
 
-__Scale:__  
-This controls the size that the texture will appear on the curve. __Scale__ < 1 will make the texture bigger and scale > 1 will make the texture smaller. When in rectangle mode length scale controls the scaling along the length of the curve, width scaling controls the scaling along the top of the rectangle, and height scaling controls the scaling along the side of the rectangle.
-
 There are options for setting how the UVs for the curve should look. Different Modes have different numbers of options for UVs because some modes take UVs from an input object also.
 
 __<ins>Parameters</ins>__
+
+__Scale:__  
+This controls the size that the texture will appear on the curve. __Scale__ < 1 will make the texture bigger and scale > 1 will make the texture smaller. When in rectangle mode length scale controls the scaling along the length of the curve, width scaling controls the scaling along the top of the rectangle, and height scaling controls the scaling along the side of the rectangle. When in tube mode length scale controls the scaling along the length of the curve, width scale controls the scale along the circumference of the circle, and height scale controls the scale along the thickness of the circle. When in custom mode the only option availible is length scale which controls the scaling along the length of the curve because the other UVs are taken from the __Cross Section__ GameObject. When in fit to curve mode all UVs are taken from the __Fit to Curve__ GameObject.
+
+<table><tr>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/scale0.5.png?raw=true" alt="Length Scale 0.5" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/scale1.png?raw=true" alt="Length Scale 1" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/scale2.png?raw=true" alt="Length Scale 2" style="width: 350px;"/> </td>
+</tr>
+<tr>
+  <td>Length Scale is 0.5</td>
+  <td>Length Scale is 1</td>
+  <td>Length Scale is 2</td>
+</tr></table>
+
+__Offset:__  
+This controls what what hpw far along the texture will begin. When in rectangle mode length offset controls the offset along the length of the curve, width offset controls the offset along the top of the rectangle, and height scaling controls the offset along the side of the rectangle. When in tube mode length offset controls the scaling along the length of the curve, width offset controls the offset along the circumference of the circle, and height offset controls the offset along the thickness of the circle. When in custom mode the only option availible is length offset which controls the scaling along the length of the curve because the other UVs are taken from the __Cross Section__ GameObject. When in fit to curve mode all UVs are taken from the __Fit to Curve__ GameObject.
 
 ### Shape
 __rectange__: The cross section of the curve will be a rectangle.    
