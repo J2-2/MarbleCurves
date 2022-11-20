@@ -339,6 +339,29 @@ This controls the size that the texture will appear on the curve. __Scale__ < 1 
 __Offset:__  
 This controls what what hpw far along the texture will begin. When in rectangle mode length offset controls the offset along the length of the curve, width offset controls the offset along the top of the rectangle, and height scaling controls the offset along the side of the rectangle. When in tube mode length offset controls the scaling along the length of the curve, width offset controls the offset along the circumference of the circle, and height offset controls the offset along the thickness of the circle. When in custom mode the only option availible is length offset which controls the scaling along the length of the curve because the other UVs are taken from the __Cross Section__ GameObject. When in fit to curve mode all UVs are taken from the __Fit to Curve__ GameObject.
 
+<table><tr>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/uvoffset-0.25.png?raw=true" alt="Length Offset -0.25" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/uvoffset0.png?raw=true" alt="Length Offset 0" style="width: 350px;"/> </td>
+  <td> <img src="https://github.com/J2-2/MarbleCurves/blob/main/UserManualResources/uvoffset0.25.png?raw=true" alt="Length Offset 0.25" style="width: 350px;"/> </td>
+</tr>
+<tr>
+  <td>Length Offset is -0.25</td>
+  <td>Length Offset is 0</td>
+  <td>Length Offset is 0.25</td>
+</tr></table>
+
+<a name="curve_options"></a>
+### Curve Options
+
+Some additional options for how the curve should appear.
+
+__<ins>Parameters</ins>__
+
+__Angle Interpolation:__  
+This controls how the orientation of the curve is interpolated between nodes. With __linear__ interpolation the angle of the platform between two nodes will be interpolated linearly. With __smooth__ interpolation The angle of the platform between two nodes will be disproportionately close to the node that it is closer to.
+
+
+
 ### Shape
 __rectange__: The cross section of the curve will be a rectangle.    
 __tube__: The cross section of the curve will be a circle.    
