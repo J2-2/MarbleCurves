@@ -7,7 +7,8 @@ To install Marble Curves, on github go to Code>Download Zip to download a zip fi
 
 ## Video Tutorials
 
-Coming Soon
+A brief overview of using the nodes and the four curve modes.  
+https://youtu.be/UWdwOsa5cds
 
 ## User Manual
 
