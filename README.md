@@ -318,6 +318,9 @@ This option wether the length of the object is stretched or compressed so that i
 <a name="uvs"></a>
 ### UVs
 
+__Scale:__  
+This controls the size that the texture will appear on the curve. __Scale__ < 1 will make the texture bigger and scale > 1 will make the texture smaller. When in rectangle mode length scale controls the scaling along the length of the curve, width scaling controls the scaling along the top of the rectangle, and height scaling controls the scaling along the side of the rectangle.
+
 There are options for setting how the UVs for the curve should look. Different Modes have different numbers of options for UVs because some modes take UVs from an input object also.
 
 __<ins>Parameters</ins>__
