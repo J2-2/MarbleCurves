@@ -328,6 +328,7 @@ public class CurveMaker : EditorWindow
 			mesh.uv = curve.uvs;
 			mesh.triangles = curve.triangles;
 			mesh.normals = curve.meshNormals;
+			mesh.tangents = curve.meshTangents;
 			mesh.name = "curveMesh";
 			mf.sharedMesh = mesh;
 			mc.sharedMesh = mesh;
