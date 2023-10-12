@@ -113,6 +113,7 @@ public class CurveMaker : EditorWindow
 	// create a new nodes object, populate it with numNodes children, and put it in nodeParent
 	private void CreateNodes() {
 		nodeParent = new GameObject("Nodes");
+		nodeParent.AddComponent<LineRenderer>();
 		nodeParent.AddComponent(typeof(NodeInfo));
 		Vector3 cameraPosition = UnityEditor.SceneView.lastActiveSceneView.camera.transform.position + 
 			                     UnityEditor.SceneView.lastActiveSceneView.camera.transform.forward*50;
@@ -558,11 +559,13 @@ public class CurveMaker : EditorWindow
 			ni.endFace = EditorGUILayout.Toggle("End:", ni.endFace);
 			EditorGUILayout.EndHorizontal();
 		}
-		
+
+		UnityEditor.EditorGUIUtility.labelWidth = 120;
+		ni.preview = EditorGUILayout.Toggle("Show Preview Line:", ni.preview);
+
 		if (GUILayout.Button("Make Curve")) {
 			MakeCurve();
 		}
-		
 		
 		EditorGUILayout.LabelField(message);
 
